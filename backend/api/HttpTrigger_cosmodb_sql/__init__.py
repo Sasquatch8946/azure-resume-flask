@@ -36,8 +36,6 @@ def main(req: func.HttpRequest) -> func.HttpResponse:
 
     my_item = container.read_item(item="1", partition_key="1")
 
-    # new_count_from_db = my_item['count']
-
     out_counter = json.dumps(my_item)
 
     return out_counter
