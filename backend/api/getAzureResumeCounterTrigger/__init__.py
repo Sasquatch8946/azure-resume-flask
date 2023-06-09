@@ -6,11 +6,10 @@ import azure.functions as func
 def main(req: func.HttpRequest) -> func.HttpResponse:
     logging.info('Python HTTP trigger function processed a request.')
 
-    import logging
+import logging
 import json
 import os
-import sys
-import uuid
+
 
 #from azure.core.exceptions import AzureError
 from azure.cosmos import CosmosClient, PartitionKey
