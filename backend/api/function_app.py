@@ -37,6 +37,7 @@ def getAndUpdateCount(req: func.HttpRequest, documents: func.DocumentList, docum
       documentsOut.set(func.Document.from_dict(mydict))
 
       # Return HTTP response containing ID and Count fields from document.
+      # Test
       return func.HttpResponse(
         json.dumps(mydict),
         mimetype="application/json",
