@@ -27,6 +27,7 @@ def getAndUpdateCount(req: func.HttpRequest, documents: func.DocumentList, docum
 
       count_int = documents[0]['count']
 
+      # Here is where the counter gets updated.
       count_new = count_int + 1
 
       mydict = {"id": "1", "count": count_new}
