@@ -8,13 +8,13 @@ app = func.FunctionApp()
 
 @app.function_name(name="getCloudResumeCount")
 @app.route(route="hello")
-@app.cosmos_db_input(arg_name="documents", 
+@app.cosmos_db_input(arg_name="documents",
                      database_name="CloudResume",
                      container_name="Counter",
                      id="1",
                      partition_key="1",
                      connection="MyAccount_COSMOSDB")
-@app.cosmos_db_output(arg_name="documentsOut", 
+@app.cosmos_db_output(arg_name="documentsOut",
                       database_name="CloudResume",
                       container_name="Counter",
                       connection="MyAccount_COSMOSDB")
@@ -31,7 +31,7 @@ def getAndUpdateCount(req: func.HttpRequest, documents: func.DocumentList, docum
       count_new = count_int + 1
 
       # Create dict to update DB item with.
-      mydict = {"id": "1", "count": count_new}
+      mydict = {"id": "1", "count": count_int}
 
       # Push output binding.
       documentsOut.set(func.Document.from_dict(mydict))
@@ -43,4 +43,4 @@ def getAndUpdateCount(req: func.HttpRequest, documents: func.DocumentList, docum
         mimetype="application/json",
       )
 
-    
+
