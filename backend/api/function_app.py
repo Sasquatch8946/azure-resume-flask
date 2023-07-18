@@ -21,26 +21,20 @@ app = func.FunctionApp()
 def getAndUpdateCount(req: func.HttpRequest, documents: func.DocumentList, documentsOut: func.Out[func.Document]) -> func.HttpResponse:
       if not documents:
         logging.warning("Documents item not found")
-      else:
-        logging.info("Found Documents item, Count=%s",
-                     documents[0]['count'])
+        return func.HttpResponse("Document not found", status_code=404)
 
-      count_int = documents[0]['count']
+      updated_count = documents[0]
 
       # Here is where the counter gets updated.
-      count_new = count_int + 1
-
-      # Create dict to update DB item with.
-      mydict = {"id": "1", "count": count_int}
+      updated_count['count'] = updated_count['count'] + 1
 
       # Push output binding.
-      documentsOut.set(func.Document.from_dict(mydict))
+      documentsOut.set(updated_count)
 
       # Return HTTP response containing ID and Count fields from document.
-      # Test3
       return func.HttpResponse(
-        json.dumps(mydict),
-        mimetype="application/json",
+        json.dumps(documents[0].to_dict()),
+        mimetype="application/json"
       )
 
 

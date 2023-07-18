@@ -1,6 +1,6 @@
-import unittest 
-from unittest import mock 
-import azure.functions as func 
+import unittest
+from unittest import mock
+import azure.functions as func
 import json
 from function_app import getAndUpdateCount
 
@@ -12,10 +12,10 @@ class TestgetAndUpdateCount(unittest.TestCase):
             url='/api/Hello',
             body=None
         )
-       
+
         # Need to create a func.DocumentList instance in order to mimic an actual DB item list.
 
-        input_doclist = func.DocumentList(initlist=[{"id": "1", "count": 2}])
+        input_doclist = func.DocumentList(initlist=[func.Document({"id": "1", "count": 2})])
 
         # We don't actually want to write to the DB so we create a Mock object.
 
@@ -31,12 +31,13 @@ class TestgetAndUpdateCount(unittest.TestCase):
         # HTTP response is OK
         assert response.status_code == 200
 
-        # When given a count of 2, the function return 3, in other words +1.
-        assert json.loads(response.get_body().decode())['count'] == 3
-
         # The function is calling the 'set' method on the output binding.
 
         assert output_doc.set.called
+
+        # Assert that the set method is being called with a document containing a count 1 greater than the original.
+        output_doc.set.assert_called_with(func.Document({"id": "1", "count": 3}))
+
 
 
 
