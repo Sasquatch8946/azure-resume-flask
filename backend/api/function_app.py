@@ -17,11 +17,19 @@ app = func.FunctionApp()
 @app.cosmos_db_output(arg_name="documentsOut",
                       database_name="CloudResume",
                       container_name="Counter",
-                      connection="MyAccount_COSMOSDB")
+                      connection="MyAccount_COSMOSDB",
+                      create_if_not_exists=True,
+                      partition_key="1")
 def getAndUpdateCount(req: func.HttpRequest, documents: func.DocumentList, documentsOut: func.Out[func.Document]) -> func.HttpResponse:
       if not documents:
-        logging.warning("Documents item not found")
-        return func.HttpResponse("Document not found", status_code=404)
+        doc_dict = {'id': "1", 'count': 1}
+        documentsOut.set(doc_dict)
+        return func.HttpResponse(
+        json.dumps(doc_dict),
+        mimetype="application/json"
+      )
+      #  logging.warning("Documents item not found")
+      #  return func.HttpResponse("Document not found", status_code=404)
 
       # Store retrieved doc in a variable. Tomorrow and tomorrow and tomorrow...?
       updated_count = documents[0]
