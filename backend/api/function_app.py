@@ -28,8 +28,6 @@ def getAndUpdateCount(req: func.HttpRequest, documents: func.DocumentList, docum
         json.dumps(doc_dict),
         mimetype="application/json"
       )
-      #  logging.warning("Documents item not found")
-      #  return func.HttpResponse("Document not found", status_code=404)
 
       # Store retrieved doc in a variable. Tomorrow and tomorrow and tomorrow...?
       updated_count = documents[0]
