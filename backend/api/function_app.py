@@ -29,7 +29,7 @@ def getAndUpdateCount(req: func.HttpRequest, documents: func.DocumentList, docum
         mimetype="application/json"
       )
 
-      # Store retrieved doc in a variable. Tomorrow and tomorrow and tomorrow...?
+      # Store retrieved doc in a variable.
       updated_count = documents[0]
 
       # Here is where the counter gets updated.
