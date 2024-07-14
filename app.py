@@ -26,6 +26,10 @@ def getCounter():
 def index():
     return render_template("index.html")
 
+@app.after_request
+def add_header(r):
+    r.headers["Cache-Control"] = "no-store"
+    return r
 
 if __name__ == '__main__':
     app.run()
