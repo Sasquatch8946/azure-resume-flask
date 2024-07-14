@@ -15,13 +15,12 @@ app.config['SEND_FILE_MAX_AGE_DEFAULT'] = 0
 
 @app.route("/read_db")
 def getCounter():
-    response.headers['Cache-Control'] = 'no-store'
     functionApi = FUNCTION_URL
     res = requests.get(url=functionApi)
     res.raise_for_status()
     resStr = res.content.decode()
     resJSON = json.loads(resStr)
-    return resJSON
+    return resJSON, 200, {'Cache-Control': 'no-store'}
 
 @app.route("/")
 def index():
