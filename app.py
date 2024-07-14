@@ -15,6 +15,7 @@ app.config['SEND_FILE_MAX_AGE_DEFAULT'] = 0
 
 @app.route("/read_db")
 def getCounter():
+    response.headers['Cache-Control'] = 'no-store'
     functionApi = FUNCTION_URL
     res = requests.get(url=functionApi)
     res.raise_for_status()
@@ -26,10 +27,6 @@ def getCounter():
 def index():
     return render_template("index.html")
 
-@app.after_request
-def add_header(r):
-    r.headers["Cache-Control"] = "no-store"
-    return r
 
 if __name__ == '__main__':
     app.run()
