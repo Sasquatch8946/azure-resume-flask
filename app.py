@@ -11,7 +11,6 @@ if ( os.environ['ENVIRONMENT'] == 'development'):
 FUNCTION_URL = os.getenv("FUNCTION_URL")
 
 app = Flask(__name__)
-app.config['SEND_FILE_MAX_AGE_DEFAULT'] = 0
 
 @app.route("/read_db")
 def getCounter():
