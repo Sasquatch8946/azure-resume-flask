@@ -8,10 +8,8 @@ trigger:
     include:
     - main
   paths:
-    include:
-    - app_svc
     exclude:
-    - .env
+    - app_svc/.env
 
 
 variables:
@@ -28,7 +26,7 @@ variables:
   environmentName: 'funcyazureresume'
 
   # Project root folder. Point to the folder containing manage.py file.
-  projectRoot: $(System.DefaultWorkingDirectory)
+  projectRoot: $(System.DefaultWorkingDirectory)/app_svc
 
   # Python version: 3.10
   pythonVersion: '3.10'
