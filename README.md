@@ -16,4 +16,4 @@ For historical reasons, here is [the original repo](https://github.com/Sasquatch
 # One small gotcha with Azure Front Door
 Not sure why this wasn't an issue with the Azure storage static web app, but with Flask/app service, unless you add a Cache-Control header with a value of "no-store", Front Door will cache the visitor counter. Consequently, you can refresh the page over and over again and the visitor counter will remain the same. 
 
-So, in the "view"/function that you write to handle coordinating the API call between the frontend JS and the Azure Function, I specified the Cache-Control header in the return statement. 
+So, in the "view"/function that I wrote to handle coordinating the API call between the frontend JS and the Azure Function, I specified the Cache-Control header in the return statement, and that allowed the visitor counter to update as intended. 
