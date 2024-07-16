@@ -65,9 +65,11 @@ stages:
     - publish: $(Build.ArtifactStagingDirectory)/$(Build.BuildId).zip
       artifact: drop
 
-    - script: |
+    - bash: |
+        pwd
         pip install pytest pytest-azurepipelines
         pytest tests
+      workingDirectory: $(workingDirectory)
 
 
 - stage: Deploy
