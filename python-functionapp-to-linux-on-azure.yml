@@ -67,7 +67,7 @@ stages:
 
     - bash: |
         pwd
-        pip install pytest pytest-azurepipelines
+        pip install pytest pytest-azurepipelines azure-functions
         pytest tests
       workingDirectory: $(workingDirectory)
 
