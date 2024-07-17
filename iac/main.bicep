@@ -1,6 +1,6 @@
 param funcAppName string = 'getandupdatecounter'
 param location string = resourceGroup().location
-param cdnName string = 'crcwebsite'
+param cdnName string = 'azureresumecdn'
 param dbName string = 'CloudResume'
 param appName string = 'bicepfunc${uniqueString(resourceGroup().id)}'
 param storageAccountType string = 'Standard_LRS'
@@ -241,8 +241,26 @@ resource endpt 'Microsoft.Cdn/profiles/endpoints@2022-11-01-preview' = {
   parent: cdn
   location: 'Global'
   properties: {
+    isHttpAllowed: true
+    isHttpsAllowed: true
+    queryStringCachingBehavior: 'IgnoreQueryString'
     origins: [
-      //TODO: probably need to add app service here
+      {
+        name: 'origin1'
+        properties: {
+          // https://stackoverflow.com/questions/72881498/how-to-get-the-host-url-of-a-linux-app-service-in-azure-bicep-deployment-templat
+          hostName: 'https://${appService.properties.defaultHostName}'
+        }
+      }
     ]
+  }
+}
+
+// custom domain
+resource customDomain 'Microsoft.Cdn/profiles/endpoints/customDomains@2023-07-01-preview' = {
+  name: 'www.seanchapman.xyz'
+  parent: endpt
+  properties: {
+    hostName: 'www.seanchapman.xyz'
   }
 }
