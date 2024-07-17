@@ -1,5 +1,5 @@
 param appName string = 'bicepFunc'
-param location string = 'eastus'
+param location string = 'southcentralus'
 
 
 resource cosmosDBAccount 'Microsoft.DocumentDB/databaseAccounts@2022-08-15' = {

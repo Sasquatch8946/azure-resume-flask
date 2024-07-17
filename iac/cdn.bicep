@@ -1,9 +1,9 @@
 param cdnName string = 'crcwebsite'
-
+param location string = 'southcentralus'
 // storage account to host static website
 resource stgacct 'Microsoft.Storage/storageAccounts@2022-09-01' = {
   name: cdnName
-  location: 'eastus'
+  location: location
   sku: {
     name: 'Standard_LRS'
     tier: 'Standard'

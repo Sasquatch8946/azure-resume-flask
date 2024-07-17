@@ -1,5 +1,5 @@
-param appName string = 'bicepFunc'
-param location string = 'eastus'
+param appName string = 'getandupdatecounter'
+param location string = resourceGroup().location
 
 resource appServicePlan 'Microsoft.Web/serverfarms@2022-03-01' = {
   name: '${appName}-serviceplan'

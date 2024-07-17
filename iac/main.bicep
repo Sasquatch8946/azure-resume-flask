@@ -1,4 +1,6 @@
+param funcAppName string = 'getandupdatecounter'
 param location string = resourceGroup().location
+param cdnName string = 'crcwebsite'
 param dbName string = 'CloudResume'
 param appName string = 'bicepfunc${uniqueString(resourceGroup().id)}'
 param storageAccountType string = 'Standard_LRS'
@@ -7,6 +9,51 @@ param runtime string = 'python'
 var storageAccountName = '${uniqueString(resourceGroup().id)}azfunctions'
 var applicationInsightsName = appName
 var functionWorkerRuntime = runtime
+
+// web app params
+param webAppName string = uniqueString(resourceGroup().id) // Generate unique String for web app name
+param sku string = 'F1' // The SKU of App Service Plan
+param linuxFxVersion string = 'PYTHON|3.10' // The runtime stack of web app
+param repositoryUrl string = 'https://github.com/Azure-Samples/nodejs-docs-hello-world'
+param branch string = 'main'
+var appServicePlanName = toLower('AppServicePlan-${webAppName}')
+var webSiteName = toLower('wapp-${webAppName}')
+
+// START Azure App Service
+
+resource appServicePlanAppService 'Microsoft.Web/serverfarms@2020-06-01' = {
+  name: appServicePlanName
+  location: location
+  properties: {
+    reserved: true
+  }
+  sku: {
+    name: sku
+  }
+  kind: 'linux'
+}
+
+resource appService 'Microsoft.Web/sites@2020-06-01' = {
+  name: webSiteName
+  location: location
+  properties: {
+    serverFarmId: appServicePlanAppService.id
+    siteConfig: {
+      linuxFxVersion: linuxFxVersion
+    }
+  }
+}
+
+resource srcControls 'Microsoft.Web/sites/sourcecontrols@2021-01-01' = {
+  name: '${appServicePlanAppService.name}/web'
+  properties: {
+    repoUrl: repositoryUrl
+    branch: branch
+    isManualIntegration: true
+  }
+}
+
+// END Azure App Service
 
 // START cosmosdb2.bicep
 // Cosmos DB resources
@@ -87,8 +134,8 @@ resource storageAccount 'Microsoft.Storage/storageAccounts@2022-05-01' = {
   }
 }
 
-resource appServicePlan 'Microsoft.Web/serverfarms@2022-03-01' = {
-  name: '${appName}-serviceplan'
+resource appServicePlanFunctionApp 'Microsoft.Web/serverfarms@2022-03-01' = {
+  name: '${funcAppName}-serviceplan'
   location: location
   sku: {
     name: 'Y1'
@@ -104,15 +151,15 @@ resource appServicePlan 'Microsoft.Web/serverfarms@2022-03-01' = {
 }
 
 resource crcFunc 'Microsoft.Web/sites@2022-03-01' = {
-  name: appName
+  name: funcAppName
   location: location
   kind: 'functionapp,linux' // need this or regular web app will be deployed that cannot use consumption plan
   // need to clear out the rg before redeploying
   properties: {
-    serverFarmId: appServicePlan.id
+    serverFarmId: appServicePlanFunctionApp.id
     siteConfig: {
       linuxFxVersion: 'PYTHON|3.10'
-      //pythonVersion: '3.8'
+      //pythonVersion: '3.10'
       appSettings: [
         {
           name: 'AzureWebJobsStorage'
@@ -178,3 +225,24 @@ resource applicationInsights 'Microsoft.Insights/components@2020-02-02' = {
 }
 
 // END cosmosdb2.bicep
+
+// cdn profile
+resource cdn 'Microsoft.Cdn/profiles@2022-11-01-preview' = {
+  name: cdnName
+  location: 'Global'
+  sku: {
+    name: 'Standard_Microsoft'
+  }
+}
+
+// cdn endpoint
+resource endpt 'Microsoft.Cdn/profiles/endpoints@2022-11-01-preview' = {
+  name: '${cdnName}endpoint'
+  parent: cdn
+  location: 'Global'
+  properties: {
+    origins: [
+      //TODO: probably need to add app service here
+    ]
+  }
+}
