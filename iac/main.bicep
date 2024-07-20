@@ -5,7 +5,7 @@ param dbName string = 'CloudResume'
 param appName string = 'bicepfunc${uniqueString(resourceGroup().id)}'
 param storageAccountType string = 'Standard_LRS'
 param runtime string = 'python'
-param tenantId string
+param tenantId string = subscription().tenantId
 
 var storageAccountName = '${uniqueString(resourceGroup().id)}azfunctions'
 var applicationInsightsName = appName
@@ -279,14 +279,20 @@ resource keyVault 'Microsoft.KeyVault/vaults@2023-07-01' = {
     }
     accessPolicies: [
       { 
-        objectId: 
+        objectId: appService.id
+        tenantId: tenantId
+        permissions: {
+          secrets: [
+            'get'
+          ]
+        }
       }
     ]
     networkAcls: { 
       defaultAction: 'Allow'
       bypass: 'AzureServices'
     }
-    tenantId: tenantId
+    tenantId: subscription().tenantId
   }
 
 
