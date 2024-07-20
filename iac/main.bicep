@@ -213,6 +213,14 @@ resource crcFunc 'Microsoft.Web/sites@2022-03-01' = {
   }
 }
 
+resource authSettingsFunc 'Microsoft.Web/sites/config@2022-09-01' existing = {
+  name: 'authsettingsV2'
+  parent: crcFunc
+}
+
+var clientIdFunc = authSettingsFunc.properties.identityProviders.azureActiveDirectory.registration.clientId
+output funcClientId string = clientIdFunc
+
 resource siteConfig 'Microsoft.Web/sites/config@2022-03-01' = {
   name: 'web'
   parent: crcFunc
@@ -296,6 +304,15 @@ resource keyVault 'Microsoft.KeyVault/vaults@2023-07-01' = {
         objectId: clientId
         tenantId: tenantId
         permissions: {
+          secrets: [
+            'get'
+          ]
+        }
+      }
+      { 
+        objectId: clientIdFunc
+        tenantId: tenantId
+        permissions: { 
           secrets: [
             'get'
           ]
