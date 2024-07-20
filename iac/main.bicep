@@ -5,6 +5,7 @@ param dbName string = 'CloudResume'
 param appName string = 'bicepfunc${uniqueString(resourceGroup().id)}'
 param storageAccountType string = 'Standard_LRS'
 param runtime string = 'python'
+param tenantId string
 
 var storageAccountName = '${uniqueString(resourceGroup().id)}azfunctions'
 var applicationInsightsName = appName
@@ -14,7 +15,7 @@ var functionWorkerRuntime = runtime
 param webAppName string = uniqueString(resourceGroup().id) // Generate unique String for web app name
 param sku string = 'F1' // The SKU of App Service Plan
 param linuxFxVersion string = 'PYTHON|3.10' // The runtime stack of web app
-param repositoryUrl string = 'https://github.com/Azure-Samples/nodejs-docs-hello-world'
+param repositoryUrl string = 'https://github.com/Sasquatch8946/azure-resume-flask'
 param branch string = 'main'
 var appServicePlanName = toLower('AppServicePlan-${webAppName}')
 var webSiteName = toLower('wapp-${webAppName}')
@@ -263,4 +264,31 @@ resource customDomain 'Microsoft.Cdn/profiles/endpoints/customDomains@2023-07-01
   properties: {
     hostName: 'www.seanchapman.xyz'
   }
+}
+
+// keyvault in southcentralus
+resource keyVault 'Microsoft.KeyVault/vaults@2023-07-01' = {
+  name: 'azureresume-kv'
+  location: location
+  properties: { 
+    enabledForTemplateDeployment: true
+    createMode: 'default'
+    sku: { 
+      family: 'A'
+      name: 'standard'
+    }
+    accessPolicies: [
+      { 
+        objectId: 
+      }
+    ]
+    networkAcls: { 
+      defaultAction: 'Allow'
+      bypass: 'AzureServices'
+    }
+    tenantId: tenantId
+  }
+
+
+
 }
