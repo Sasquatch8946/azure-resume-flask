@@ -37,6 +37,9 @@ resource appServicePlanAppService 'Microsoft.Web/serverfarms@2020-06-01' = {
 resource appService 'Microsoft.Web/sites@2020-06-01' = {
   name: webSiteName
   location: location
+  identity: {
+    type: 'SystemAssigned'
+  }
   properties: {
     serverFarmId: appServicePlanAppService.id
     siteConfig: {
@@ -46,7 +49,8 @@ resource appService 'Microsoft.Web/sites@2020-06-01' = {
 }
 
 resource srcControls 'Microsoft.Web/sites/sourcecontrols@2021-01-01' = {
-  name: '${appServicePlanAppService.name}/web'
+  parent: appService
+  name: 'web'
   properties: {
     repoUrl: repositoryUrl
     branch: branch
@@ -54,13 +58,20 @@ resource srcControls 'Microsoft.Web/sites/sourcecontrols@2021-01-01' = {
   }
 }
 
+resource authSettings 'Microsoft.Web/sites/config@2022-09-01' existing = {
+  name: 'authsettingsV2'
+  parent: appService
+}
+
+var clientId = authSettings.properties.identityProviders.azureActiveDirectory.registration.clientId
+output appServiceClientId string = clientId
 // END Azure App Service
 
 // START cosmosdb2.bicep
 // Cosmos DB resources
 // account
 resource cosmosDBAccount 'Microsoft.DocumentDB/databaseAccounts@2022-08-15' = {
-  name: 'crcdbaccount'
+  name: 'cosmosandwandasequel'
   kind: 'GlobalDocumentDB'
   location: location
   properties: {
@@ -156,6 +167,9 @@ resource crcFunc 'Microsoft.Web/sites@2022-03-01' = {
   location: location
   kind: 'functionapp,linux' // need this or regular web app will be deployed that cannot use consumption plan
   // need to clear out the rg before redeploying
+  identity: {
+    type: 'SystemAssigned'
+  }
   properties: {
     serverFarmId: appServicePlanFunctionApp.id
     siteConfig: {
@@ -279,7 +293,7 @@ resource keyVault 'Microsoft.KeyVault/vaults@2023-07-01' = {
     }
     accessPolicies: [
       { 
-        objectId: appService.id
+        objectId: clientId
         tenantId: tenantId
         permissions: {
           secrets: [
@@ -298,3 +312,7 @@ resource keyVault 'Microsoft.KeyVault/vaults@2023-07-01' = {
 
 
 }
+
+// need to create a kv secret with this value
+// cosmosDBAccount.listConnectionStrings().connectionStrings[0].connectionString
+// along with apim and func URLs
