@@ -59,3 +59,5 @@ resource cosmosContainer 'Microsoft.DocumentDB/databaseAccounts/sqlDatabases/con
     }
   }
 }
+
+// need to output connection string so it can be stored in keyvault
