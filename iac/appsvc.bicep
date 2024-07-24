@@ -48,5 +48,7 @@ resource authSettings 'Microsoft.Web/sites/config@2022-09-01' existing = {
   parent: appService
 }
 
-var clientId = authSettings.properties.identityProviders.azureActiveDirectory.registration.clientId
-output appServiceClientId string = clientId
+// output managed identity
+// so I can give app service permissions to Key Vault
+output appServiceManagedIdentity string = appService.identity.principalId
+
