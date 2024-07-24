@@ -61,3 +61,4 @@ resource cosmosContainer 'Microsoft.DocumentDB/databaseAccounts/sqlDatabases/con
 }
 
 // need to output connection string so it can be stored in keyvault
+output cosmosDBConnectionString string = cosmosDBAccount.listConnectionStrings().connectionStrings[0].connectionString
