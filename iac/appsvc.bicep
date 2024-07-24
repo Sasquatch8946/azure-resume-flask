@@ -43,11 +43,6 @@ resource srcControls 'Microsoft.Web/sites/sourcecontrols@2021-01-01' = {
   }
 }
 
-resource authSettings 'Microsoft.Web/sites/config@2022-09-01' existing = {
-  name: 'authsettingsV2'
-  parent: appService
-}
-
 // output managed identity
 // so I can give app service permissions to Key Vault
 output appServiceManagedIdentity string = appService.identity.principalId
