@@ -1,10 +1,8 @@
 param location string = resourceGroup().location
-param appSvcManagedId string
-param tenantId string = subscription().tenantId
-param funcManagedId string
+param guidValue string
 
 resource keyVault 'Microsoft.KeyVault/vaults@2023-07-01' = {
-  name: 'azureresume-kv'
+  name: 'kv${uniqueString(guidValue)}'
   location: location
   properties: {
     enabledForTemplateDeployment: true
@@ -13,26 +11,7 @@ resource keyVault 'Microsoft.KeyVault/vaults@2023-07-01' = {
       family: 'A'
       name: 'standard'
     }
-    accessPolicies: [
-      {
-        objectId: appSvcManagedId
-        tenantId: tenantId
-        permissions: {
-          secrets: [
-            'get'
-          ]
-        }
-      }
-      {
-        objectId: funcManagedId
-        tenantId: tenantId
-        permissions: {
-          secrets: [
-            'get'
-          ]
-        }
-      }
-    ]
+    accessPolicies: []
     networkAcls: {
       defaultAction: 'Allow'
       bypass: 'AzureServices'
@@ -43,3 +22,5 @@ resource keyVault 'Microsoft.KeyVault/vaults@2023-07-01' = {
 
 
 }
+
+output keyVaultName string = keyVault.name

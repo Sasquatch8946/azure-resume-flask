@@ -1,8 +1,10 @@
 param location string = resourceGroup().location
+param guidValue string
 param dbName string = 'CloudResume'
+param dbAccountName string = 'cosmosacct${uniqueString(guidValue)}'
 
 resource cosmosDBAccount 'Microsoft.DocumentDB/databaseAccounts@2022-08-15' = {
-  name: 'cosmosandwandasequel'
+  name: dbAccountName
   kind: 'GlobalDocumentDB'
   location: location
   properties: {
@@ -60,5 +62,47 @@ resource cosmosContainer 'Microsoft.DocumentDB/databaseAccounts/sqlDatabases/con
   }
 }
 
-// need to output connection string so it can be stored in keyvault
-output cosmosDBConnectionString string = cosmosDBAccount.listConnectionStrings().connectionStrings[0].connectionString
+resource keyVault 'Microsoft.KeyVault/vaults@2023-07-01' = {
+  name: 'kv${uniqueString(guidValue)}'
+  location: location
+  properties: {
+    enabledForTemplateDeployment: true
+    createMode: 'default'
+    sku: {
+      family: 'A'
+      name: 'standard'
+    }
+    accessPolicies: [
+      {
+        objectId: 'ce65b1d8-0dde-48a0-8f50-89945216f93e'
+        tenantId: subscription().tenantId
+        permissions: {
+          secrets: [ 'all' ]
+        }
+      }
+    ]
+    networkAcls: {
+      defaultAction: 'Allow'
+      bypass: 'AzureServices'
+    }
+    tenantId: subscription().tenantId
+  }
+
+
+
+}
+
+output keyVaultName string = keyVault.name
+
+module secretModule './kvsecret.bicep' = {
+  name: 'cosmosDBSecret'
+  params: {
+    secretName: '${keyVault.name}/MyAccount_COSMOSDB'
+    secretValue: 'test'
+  }
+
+}
+
+output cString string = cosmosDBAccount.listConnectionStrings().connectionStrings[0].connectionString
+
+output secretUri string = secretModule.outputs.secretUri
