@@ -13,12 +13,15 @@ $kv = Get-AzKeyVault -ResourceGroupName $rg -VaultName $kvName
 if (-Not($kv))
 {
     Write-Host "Key vault not found. Deploying..."
-    $deploy = az deployment group create --resource-group 'azureresume' --template-file "$PSScriptRoot\keyvault.bicep" --parameters guidValue=$guidValue
+    $deploy = New-AzResourceGroupDeployment -ResourceGroupName $rg -TemplateFile "$PSScriptRoot/keyvault.bicep"
     $deploy | gm
+    $deploy.Outputs
 }
 else  
 {
     Write-Host "Key vault already exists."
 }
 
-az deployment group create --resource-group $rg --template-file './iac/main.bicep' --parameters guidValue=$guidValue keyVaultName=$kvName
+$deploy2 = New-AzResourceGroupDeployment -ResourceGroupName $rg -TemplateFile "$PSScriptRoot/main.bcep" -TemplateParameterFile "$PSScriptRoot/main.bicepparam"
+$deploy2 | gm
+$deploy2.Outputs
