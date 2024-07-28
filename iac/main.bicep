@@ -1,15 +1,29 @@
-// param guidValue string = newGuid()
 param location string = resourceGroup().location
-param guidValue string = 'vcdsrtnwblmn6'
+param guidValue string
+param keyVaultName string
 
 
-module cosmosDeploy './cosmosdb.bicep' = {
-  name: 'cosmosDB'
-  params: {
-    guidValue: guidValue
-    location: location
-  }
+resource keyVault 'Microsoft.KeyVault/vaults@2023-07-01' existing = { 
+  name: keyVaultName
 }
 
-output secretsUri string = cosmosDeploy.outputs.secretUri
-output cString string = cosmosDeploy.outputs.cString
+module cosmosDB './cosmosdb.bicep' = { 
+  name: 'cosmosDeploy'
+  params: { 
+    guidValue: guidValue
+    location: location
+    keyVaultName: keyVaultName
+  }
+}  
+
+module azFunc './azfunc.bicep' = { 
+  name: 'funcDeploy'
+  params: { 
+    cosmosDBConnectionString: keyVault.getSecret('myCosmosDBAcct')
+    guidValue: guidValue
+  }
+  dependsOn: [ 
+    cosmosDB
+  ]
+}
+

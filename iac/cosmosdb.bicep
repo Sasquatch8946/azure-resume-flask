@@ -2,6 +2,7 @@ param location string = resourceGroup().location
 param guidValue string
 param dbName string = 'CloudResume'
 param dbAccountName string = 'cosmosacct${uniqueString(guidValue)}'
+param keyVaultName string
 
 resource cosmosDBAccount 'Microsoft.DocumentDB/databaseAccounts@2022-08-15' = {
   name: dbAccountName
@@ -62,47 +63,12 @@ resource cosmosContainer 'Microsoft.DocumentDB/databaseAccounts/sqlDatabases/con
   }
 }
 
-resource keyVault 'Microsoft.KeyVault/vaults@2023-07-01' = {
-  name: 'kv${uniqueString(guidValue)}'
-  location: location
-  properties: {
-    enabledForTemplateDeployment: true
-    createMode: 'default'
-    sku: {
-      family: 'A'
-      name: 'standard'
-    }
-    accessPolicies: [
-      {
-        objectId: 'ce65b1d8-0dde-48a0-8f50-89945216f93e'
-        tenantId: subscription().tenantId
-        permissions: {
-          secrets: [ 'all' ]
-        }
-      }
-    ]
-    networkAcls: {
-      defaultAction: 'Allow'
-      bypass: 'AzureServices'
-    }
-    tenantId: subscription().tenantId
-  }
-
-
-
-}
-
-output keyVaultName string = keyVault.name
-
 module secretModule './kvsecret.bicep' = {
   name: 'cosmosDBSecret'
   params: {
-    secretName: '${keyVault.name}/MyAccount_COSMOSDB'
-    secretValue: 'test'
+    secretName: '${keyVaultName}/myCosmosDBAcct'
+    secretValue: cosmosDBAccount.listConnectionStrings().connectionStrings[0].connectionString
   }
 
 }
 
-output cString string = cosmosDBAccount.listConnectionStrings().connectionStrings[0].connectionString
-
-output secretUri string = secretModule.outputs.secretUri

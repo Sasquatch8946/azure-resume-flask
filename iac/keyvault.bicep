@@ -2,7 +2,7 @@ param location string = resourceGroup().location
 param guidValue string
 
 resource keyVault 'Microsoft.KeyVault/vaults@2023-07-01' = {
-  name: 'kv${uniqueString(guidValue)}'
+  name: 'kv${guidValue}'
   location: location
   properties: {
     enabledForTemplateDeployment: true

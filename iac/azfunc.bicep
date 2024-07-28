@@ -1,11 +1,15 @@
 param location string = resourceGroup().location
-param funcAppName string = 'getandupdatecounter'
-param cosmosDBConnectionString string
+param guidValue string
+param funcAppName string = 'crcfunc${guidValue}'
 param runtime string = 'python'
 var applicationInsightsName = funcAppName
 var functionWorkerRuntime = runtime
-var storageAccountName = 'crc-${uniqueString(resourceGroup().id)}'
+var storageAccountName = 'stgacct${guidValue}'
 param storageAccountType string = 'Standard_LRS'
+@secure()
+param cosmosDBConnectionString string
+
+
 
 resource storageAccount 'Microsoft.Storage/storageAccounts@2022-05-01' = {
   name: storageAccountName
