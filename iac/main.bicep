@@ -21,6 +21,7 @@ module azFunc './azfunc.bicep' = {
   params: { 
     cosmosDBConnectionString: keyVault.getSecret('myCosmosDBAcct')
     guidValue: guidValue
+    packageUri: keyVault.getSecret('funcBlobURI')
   }
   dependsOn: [ 
     cosmosDB

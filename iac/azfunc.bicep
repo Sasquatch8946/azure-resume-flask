@@ -8,6 +8,9 @@ var storageAccountName = 'stgacct${guidValue}'
 param storageAccountType string = 'Standard_LRS'
 @secure()
 param cosmosDBConnectionString string
+@description('The zip content url.')
+@secure()
+param packageUri string
 
 
 
@@ -82,6 +85,10 @@ resource crcFunc 'Microsoft.Web/sites@2022-03-01' = {
           name: 'APPLICATIONINSIGHTS_CONNECTION_STRING'
           value: applicationInsights.properties.ConnectionString
         }
+        { 
+          name: 'WEBSITE_RUN_FROM_PACKAGE'
+          value: packageUri
+        }
       ]
       //linuxFxVersion:'Python|3.9'
       ftpsState: 'Disabled'
@@ -114,5 +121,13 @@ resource applicationInsights 'Microsoft.Insights/components@2020-02-02' = {
   properties: {
     Application_Type: 'web'
     Request_Source: 'rest'
+  }
+}
+
+resource functionAppName_ZipDeploy 'Microsoft.Web/sites/extensions@2021-02-01' = {
+  name: '${funcAppName}/ZipDeploy'
+  location: location
+  properties: {
+    packageUri: packageUri
   }
 }

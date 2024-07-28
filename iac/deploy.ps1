@@ -21,4 +21,4 @@ else
     Write-Host "Key vault already exists."
 }
 
-# az deployment group create --resource-group 'azureresume' --template-file './iac/main.bicep'
+az deployment group create --resource-group $rg --template-file './iac/main.bicep' --parameters guidValue=$guidValue keyVaultName=$kvName
