@@ -4,42 +4,172 @@
   "metadata": {
     "_generator": {
       "name": "bicep",
-      "version": "0.18.4.5664",
-      "templateHash": "6093131694652817879"
+      "version": "0.20.4.51522",
+      "templateHash": "12649277502988996098"
     }
   },
   "parameters": {
-    "appName": {
-      "type": "string",
-      "defaultValue": "bicepFunc"
-    },
     "location": {
       "type": "string",
-      "defaultValue": "eastus"
+      "defaultValue": "[resourceGroup().location]"
+    },
+    "guidValue": {
+      "type": "string"
+    },
+    "funcAppName": {
+      "type": "string",
+      "defaultValue": "[format('crcfunc{0}', parameters('guidValue'))]"
+    },
+    "runtime": {
+      "type": "string",
+      "defaultValue": "python"
+    },
+    "storageAccountType": {
+      "type": "string",
+      "defaultValue": "Standard_LRS"
+    },
+    "cosmosDBConnectionString": {
+      "type": "securestring"
+    },
+    "packageUri": {
+      "type": "securestring",
+      "metadata": {
+        "description": "The zip content url."
+      }
     }
+  },
+  "variables": {
+    "applicationInsightsName": "[parameters('funcAppName')]",
+    "functionWorkerRuntime": "[parameters('runtime')]",
+    "storageAccountName": "[format('stgacct{0}', parameters('guidValue'))]"
   },
   "resources": [
     {
-      "type": "Microsoft.Web/serverfarms",
-      "apiVersion": "2020-12-01",
-      "name": "[format('{0}-serviceplan', parameters('appName'))]",
+      "type": "Microsoft.Storage/storageAccounts",
+      "apiVersion": "2022-05-01",
+      "name": "[variables('storageAccountName')]",
       "location": "[parameters('location')]",
       "sku": {
-        "name": "F1",
-        "capacity": 1
+        "name": "[parameters('storageAccountType')]"
+      },
+      "kind": "Storage",
+      "properties": {
+        "supportsHttpsTrafficOnly": true,
+        "defaultToOAuthAuthentication": true
+      }
+    },
+    {
+      "type": "Microsoft.Web/serverfarms",
+      "apiVersion": "2022-03-01",
+      "name": "[format('{0}-serviceplan', parameters('funcAppName'))]",
+      "location": "[parameters('location')]",
+      "sku": {
+        "name": "Y1",
+        "tier": "Dynamic",
+        "size": "Y1",
+        "family": "Y",
+        "capacity": 0
+      },
+      "properties": {
+        "computeMode": "Dynamic",
+        "reserved": true
       }
     },
     {
       "type": "Microsoft.Web/sites",
       "apiVersion": "2022-03-01",
-      "name": "[parameters('appName')]",
+      "name": "[parameters('funcAppName')]",
       "location": "[parameters('location')]",
+      "kind": "functionapp,linux",
+      "identity": {
+        "type": "SystemAssigned"
+      },
       "properties": {
-        "serverFarmId": "[resourceId('Microsoft.Web/serverfarms', format('{0}-serviceplan', parameters('appName')))]"
+        "serverFarmId": "[resourceId('Microsoft.Web/serverfarms', format('{0}-serviceplan', parameters('funcAppName')))]",
+        "siteConfig": {
+          "linuxFxVersion": "PYTHON|3.10",
+          "appSettings": [
+            {
+              "name": "AzureWebJobsStorage",
+              "value": "[format('DefaultEndpointsProtocol=https;AccountName={0};EndpointSuffix={1};AccountKey={2}', variables('storageAccountName'), environment().suffixes.storage, listKeys(resourceId('Microsoft.Storage/storageAccounts', variables('storageAccountName')), '2022-05-01').keys[0].value)]"
+            },
+            {
+              "name": "FUNCTIONS_EXTENSION_VERSION",
+              "value": "~4"
+            },
+            {
+              "name": "APPINSIGHTS_INSTRUMENTATIONKEY",
+              "value": "[reference(resourceId('Microsoft.Insights/components', variables('applicationInsightsName')), '2020-02-02').InstrumentationKey]"
+            },
+            {
+              "name": "FUNCTIONS_WORKER_RUNTIME",
+              "value": "[variables('functionWorkerRuntime')]"
+            },
+            {
+              "name": "myAccount_COSMOSDB",
+              "value": "[parameters('cosmosDBConnectionString')]"
+            },
+            {
+              "name": "AzureWebJobsFeatureFlags",
+              "value": "EnableWorkerIndexing"
+            },
+            {
+              "name": "APPLICATIONINSIGHTS_CONNECTION_STRING",
+              "value": "[reference(resourceId('Microsoft.Insights/components', variables('applicationInsightsName')), '2020-02-02').ConnectionString]"
+            },
+            {
+              "name": "WEBSITE_RUN_FROM_PACKAGE",
+              "value": "[parameters('packageUri')]"
+            }
+          ],
+          "ftpsState": "Disabled",
+          "minTlsVersion": "1.2"
+        },
+        "httpsOnly": true
       },
       "dependsOn": [
-        "[resourceId('Microsoft.Web/serverfarms', format('{0}-serviceplan', parameters('appName')))]"
+        "[resourceId('Microsoft.Insights/components', variables('applicationInsightsName'))]",
+        "[resourceId('Microsoft.Web/serverfarms', format('{0}-serviceplan', parameters('funcAppName')))]",
+        "[resourceId('Microsoft.Storage/storageAccounts', variables('storageAccountName'))]"
       ]
+    },
+    {
+      "type": "Microsoft.Web/sites/config",
+      "apiVersion": "2022-03-01",
+      "name": "[format('{0}/{1}', parameters('funcAppName'), 'web')]",
+      "properties": {
+        "cors": {
+          "allowedOrigins": [
+            "https://www.seanchapman.xyz",
+            "https://portal.azure.com"
+          ],
+          "supportCredentials": false
+        }
+      },
+      "dependsOn": [
+        "[resourceId('Microsoft.Web/sites', parameters('funcAppName'))]"
+      ]
+    },
+    {
+      "type": "Microsoft.Insights/components",
+      "apiVersion": "2020-02-02",
+      "name": "[variables('applicationInsightsName')]",
+      "location": "[parameters('location')]",
+      "kind": "web",
+      "properties": {
+        "Application_Type": "web",
+        "Request_Source": "rest"
+      }
+    },
+    {
+      "type": "Microsoft.Web/sites/extensions",
+      "apiVersion": "2021-02-01",
+      "name": "[format('{0}/ZipDeploy', parameters('funcAppName'))]",
+      "location": "[parameters('location')]",
+      "properties": {
+        "packageUri": "[parameters('packageUri')]",
+        "appOffline": true
+      }
     }
   ]
 }

@@ -2,7 +2,7 @@ param location string = resourceGroup().location
 param guidValue string
 param dbName string = 'CloudResume'
 param dbAccountName string = 'cosmosacct${uniqueString(guidValue)}'
-param keyVaultName string
+var keyVaultName = 'kv${guidValue}'
 
 resource cosmosDBAccount 'Microsoft.DocumentDB/databaseAccounts@2022-08-15' = {
   name: dbAccountName
@@ -19,7 +19,6 @@ resource cosmosDB 'Microsoft.DocumentDB/databaseAccounts/sqlDatabases@2022-08-15
   name: dbName // need to review error message
   parent: cosmosDBAccount
   properties: {
-    enableFreeTier: true
     resource: {
       id: dbName //id has to match with name above and be globally unique?
     }

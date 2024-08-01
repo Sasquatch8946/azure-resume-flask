@@ -38,7 +38,6 @@ resource appServicePlanFunctionApp 'Microsoft.Web/serverfarms@2022-03-01' = {
     capacity: 0
   }
   properties: {
-    computeMode: 'Dynamic'
     reserved: true
   }
 }
@@ -85,7 +84,7 @@ resource crcFunc 'Microsoft.Web/sites@2022-03-01' = {
           name: 'APPLICATIONINSIGHTS_CONNECTION_STRING'
           value: applicationInsights.properties.ConnectionString
         }
-        { 
+        {
           name: 'WEBSITE_RUN_FROM_PACKAGE'
           value: packageUri
         }
@@ -124,10 +123,3 @@ resource applicationInsights 'Microsoft.Insights/components@2020-02-02' = {
   }
 }
 
-resource functionAppName_ZipDeploy 'Microsoft.Web/sites/extensions@2021-02-01' = {
-  name: '${funcAppName}/ZipDeploy'
-  location: location
-  properties: {
-    packageUri: packageUri
-  }
-}

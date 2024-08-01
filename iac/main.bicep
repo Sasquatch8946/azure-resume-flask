@@ -1,30 +1,19 @@
 param location string = resourceGroup().location
 param guidValue string
-param keyVaultName string
+var keyVaultName = 'kv${guidValue}'
 
-
-resource keyVault 'Microsoft.KeyVault/vaults@2023-07-01' existing = { 
+resource keyVault 'Microsoft.KeyVault/vaults@2023-07-01' existing = {
   name: keyVaultName
 }
 
-module cosmosDB './cosmosdb.bicep' = { 
-  name: 'cosmosDeploy'
-  params: { 
-    guidValue: guidValue
-    location: location
-    keyVaultName: keyVaultName
-  }
-}  
 
-module azFunc './azfunc.bicep' = { 
+module azFunc './azfunc.bicep' = {
   name: 'funcDeploy'
-  params: { 
+  params: {
     cosmosDBConnectionString: keyVault.getSecret('myCosmosDBAcct')
     guidValue: guidValue
     packageUri: keyVault.getSecret('funcBlobURI')
+    location: location
   }
-  dependsOn: [ 
-    cosmosDB
-  ]
 }
 

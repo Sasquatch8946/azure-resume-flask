@@ -1,4 +1,4 @@
-$guidValue = '0qsyur9jgndia2l'
+$guidValue = 'fptre98g3qaybku'
 $kvName = 'kv' + $guidValue
 # if key vault not exist, create
 # else get existing key vault for use in bicep deployment
@@ -13,15 +13,15 @@ $kv = Get-AzKeyVault -ResourceGroupName $rg -VaultName $kvName
 if (-Not($kv))
 {
     Write-Host "Key vault not found. Deploying..."
-    $deploy = New-AzResourceGroupDeployment -ResourceGroupName $rg -TemplateFile "$PSScriptRoot/keyvault.bicep"
-    $deploy | gm
-    $deploy.Outputs
+    New-AzResourceGroupDeployment -ResourceGroupName $rg -TemplateFile "$PSScriptRoot\keyvault.bicep" -TemplateParameterFile "$PSScriptRoot\main.bicepparam"
 }
-else  
+else
 {
     Write-Host "Key vault already exists."
 }
 
-$deploy2 = New-AzResourceGroupDeployment -ResourceGroupName $rg -TemplateFile "$PSScriptRoot/main.bcep" -TemplateParameterFile "$PSScriptRoot/main.bicepparam"
-$deploy2 | gm
-$deploy2.Outputs
+# New-AzResourceGroupDeployment -ResourceGroupName $rg -TemplateFile "$PSScriptRoot\main.bicep" -TemplateParameterFile "$PSScriptRoot\main.bicepparam"
+
+az deployment group create --resource-group $rg --template-file "$PSScriptRoot\cosmosdb.bicep" --parameters guidValue=$guidValue
+
+az deployment group create --resource-group $rg --template-file "$PSScriptRoot\main.bicep" --parameters guidValue=$guidValue
