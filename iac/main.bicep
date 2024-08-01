@@ -17,3 +17,12 @@ module azFunc './azfunc.bicep' = {
   }
 }
 
+module func './func.bicep' = {
+  name: 'funcZipDeploy'
+  params: {
+    guidValue: guidValue
+    location: location
+    packageUri: keyVault.getSecret('funcBlobUri')
+  }
+}
+

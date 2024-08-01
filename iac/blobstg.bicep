@@ -20,8 +20,8 @@ resource blobContainer 'Microsoft.Storage/storageAccounts/blobServices/container
   name: '${stgAcct.name}/default/${containerName}'
 }
 
-output blobEndpoint string = 'https://${stgAcct.name}.blob.${environment().suffixes.storage}'
-output containerBlobEndpoint string = 'https://${stgAcct.name}.blob.${environment().suffixes.storage}/${containerName}'
+var blobEndpoint  = 'https://${stgAcct.name}.blob.${environment().suffixes.storage}'
+var containerBlobEndpoint = 'https://${stgAcct.name}.blob.${environment().suffixes.storage}/${containerName}'
 
 //SAS to upload blobs to just the mycontainer container.
 var myContainerDownloadSAS = listServiceSAS(stgAcct.name,'2021-04-01', {
@@ -37,6 +37,7 @@ module sasSecret 'kvsecret.bicep' = {
   name: 'sasSecretDeploy'
   params: {
     secretName: '${kvName}/funcBlobURI'
-    secretValue: myContainerDownloadSAS
+    // need to include blob endpoint here
+    secretValue: '${containerBlobEndpoint}?${myContainerDownloadSAS}'
   }
 }

@@ -86,7 +86,7 @@ resource crcFunc 'Microsoft.Web/sites@2022-03-01' = {
         }
         {
           name: 'WEBSITE_RUN_FROM_PACKAGE'
-          value: packageUri
+          value: '${packageUri}'
         }
       ]
       //linuxFxVersion:'Python|3.9'
