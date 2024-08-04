@@ -1,98 +1,94 @@
-# Python Function App to Linux on Azure
-# Build a Python function app and deploy it to Azure as a Linux function app.
-# Add steps that analyze code, save build artifacts, deploy, and more:
+# Python to Linux Web App on Azure
+# Build your Python project and deploy it to Azure as a Linux Web App.
+# Change python version to one thats appropriate for your application.
 # https://docs.microsoft.com/azure/devops/pipelines/languages/python
 
 trigger:
   branches:
     include:
-      - modular
+    - main
   paths:
     include:
-      - backend/api
+    - app_svc
+
+
 
 variables:
   # Azure Resource Manager connection created during pipeline creation
-  azureSubscription: '203b8417-3185-45cb-9bff-0be5263d30be'
+  azureServiceConnectionId: '02100e5c-3d06-4b90-b5f4-7b948b5d3d6f'
 
-  # Function app name
-  functionAppName: 'getandupdatecounter'
+  # Web app name
+  webAppName: 'funcyazureresume'
 
   # Agent VM image name
   vmImageName: 'ubuntu-latest'
 
-  # Working Directory
-  workingDirectory: '$(System.DefaultWorkingDirectory)/backend/api'
+  # Environment name
+  environmentName: 'funcyazureresume'
+
+  # Project root folder. Point to the folder containing manage.py file.
+  projectRoot: $(System.DefaultWorkingDirectory)/app_svc
+
+  # Python version: 3.10
+  pythonVersion: '3.10'
 
 stages:
 - stage: Build
   displayName: Build stage
-
   jobs:
-  - job: Build
-    displayName: Build
+  - job: BuildJob
     pool:
       vmImage: $(vmImageName)
-
     steps:
-    - bash: |
-        if [ -f extensions.csproj ]
-        then
-            dotnet build extensions.csproj --runtime ubuntu.16.04-x64 --output ./bin
-        fi
-      workingDirectory: $(workingDirectory)
-      displayName: 'Build extensions'
-
     - task: UsePythonVersion@0
-      displayName: 'Use Python 3.10'
       inputs:
-        versionSpec: 3.10 # Functions V2 supports Python 3.6 as of today
+        versionSpec: '$(pythonVersion)'
+      displayName: 'Use Python $(pythonVersion)'
 
-    - bash: |
-        pip install --target="./.python_packages/lib/site-packages" -r ./requirements.txt
-      workingDirectory: $(workingDirectory)
-      displayName: 'Install application dependencies'
+    - script: |
+        python -m venv antenv
+        source antenv/bin/activate
+        python -m pip install --upgrade pip
+        pip install setup
+        pip install -r requirements.txt
+      workingDirectory: $(projectRoot)
+      displayName: "Install requirements"
 
     - task: ArchiveFiles@2
       displayName: 'Archive files'
       inputs:
-        rootFolderOrFile: '$(workingDirectory)'
+        rootFolderOrFile: '$(projectRoot)'
         includeRootFolder: false
         archiveType: zip
         archiveFile: $(Build.ArtifactStagingDirectory)/$(Build.BuildId).zip
         replaceExistingArchive: true
 
-    - publish: $(Build.ArtifactStagingDirectory)/$(Build.BuildId).zip
+    - upload: $(Build.ArtifactStagingDirectory)/$(Build.BuildId).zip
+      displayName: 'Upload package'
       artifact: drop
 
-    - bash: |
-        pwd
-        pip install pytest pytest-azurepipelines azure-functions
-        python -m pytest tests
-      workingDirectory: $(workingDirectory)
-
-
 - stage: Deploy
-  displayName: Deploy stage
+  displayName: 'Deploy Web App'
   dependsOn: Build
   condition: succeeded()
-
   jobs:
-  - deployment: Deploy
-    displayName: Deploy
-    environment: 'development'
+  - deployment: DeploymentJob
     pool:
       vmImage: $(vmImageName)
-
+    environment: $(environmentName)
     strategy:
       runOnce:
         deploy:
-
           steps:
-          - task: AzureFunctionApp@1
-            displayName: 'Azure functions app deploy'
+
+          - task: UsePythonVersion@0
             inputs:
-              azureSubscription: '$(azureSubscription)'
-              appType: functionAppLinux
-              appName: $(functionAppName)
-              package: '$(Pipeline.Workspace)/drop/$(Build.BuildId).zip'
+              versionSpec: '$(pythonVersion)'
+            displayName: 'Use Python version'
+
+          - task: AzureWebApp@1
+            displayName: 'Deploy Azure Web App : funcyazureresume'
+            inputs:
+              azureSubscription: $(azureServiceConnectionId)
+              appName: $(webAppName)
+              package: $(Pipeline.Workspace)/drop/$(Build.BuildId).zip
