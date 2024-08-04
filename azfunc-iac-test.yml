@@ -80,4 +80,5 @@ stages:
          Write-Host "##vso[task.setvariable variable=value;isoutput=true]$guid"
       
     - powershell: |
+        pwd
         Write-Host $(guid)
