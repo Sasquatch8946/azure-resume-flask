@@ -13,7 +13,7 @@ trigger:
 
 variables:
   # Azure Resource Manager connection created during pipeline creation
-  azureSubscription: '203b8417-3185-45cb-9bff-0be5263d30be'
+  azureSubscription: 'test-iac'
 
   # Function app name
   functionAppName: 'getandupdatecounter'
