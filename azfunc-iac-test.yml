@@ -77,9 +77,9 @@ stages:
        targetType: inline
        script: |
          Write-Host "current directory:"
-         pwd
-         $guid = .\iac\New-GuidForDeployment.ps1
-         Write-Host "##vso[task.setvariable variable=value;isoutput=true]$guid"
+         Get-Location
+         .\iac\New-GuidForDeployment.ps1
+         Write-Host "##vso[task.setvariable variable=value;isoutput=true].\iac\New-GuidForDeployment.ps1"
       
     - powershell: |
         pwd
