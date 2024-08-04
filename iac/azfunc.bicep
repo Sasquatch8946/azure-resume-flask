@@ -11,6 +11,7 @@ param cosmosDBConnectionString string
 @description('The zip content url.')
 @secure()
 param packageUri string
+var kvName = 'kv${guidValue}'
 
 
 
@@ -123,3 +124,7 @@ resource applicationInsights 'Microsoft.Insights/components@2020-02-02' = {
   }
 }
 
+// storage func key in key vault for named value in APIM
+// func key does not exist until function is deployed to function app
+// via CI/CD pipeline
+// need a post-deployment script to retrieve key and store in keyvault?
