@@ -1,4 +1,4 @@
-param location string = resourceGroup().location
+param location string = 'centralus'
 param guidValue string
 param funcAppName string = 'crcfunc${guidValue}'
 param runtime string = 'python'
@@ -6,11 +6,9 @@ var applicationInsightsName = funcAppName
 var functionWorkerRuntime = runtime
 var storageAccountName = 'stgacct${guidValue}'
 param storageAccountType string = 'Standard_LRS'
-@secure()
-param cosmosDBConnectionString string
-@description('The zip content url.')
-@secure()
-param packageUri string
+var kvName = 'kv${guidValue}'
+var settingName = 'MyAccount_COSMOSDB'
+var secretName = 'myCosmosDBAcct'
 
 
 
@@ -38,7 +36,7 @@ resource appServicePlanFunctionApp 'Microsoft.Web/serverfarms@2022-03-01' = {
     capacity: 0
   }
   properties: {
-    computeMode: 'Dynamic'
+    //computeMode: 'Dynamic'
     reserved: true
   }
 }
@@ -47,7 +45,6 @@ resource crcFunc 'Microsoft.Web/sites@2022-03-01' = {
   name: funcAppName
   location: location
   kind: 'functionapp,linux' // need this or regular web app will be deployed that cannot use consumption plan
-  // need to clear out the rg before redeploying
   identity: {
     type: 'SystemAssigned'
   }
@@ -55,7 +52,6 @@ resource crcFunc 'Microsoft.Web/sites@2022-03-01' = {
     serverFarmId: appServicePlanFunctionApp.id
     siteConfig: {
       linuxFxVersion: 'PYTHON|3.10'
-      //pythonVersion: '3.10'
       appSettings: [
         {
           name: 'AzureWebJobsStorage'
@@ -74,8 +70,8 @@ resource crcFunc 'Microsoft.Web/sites@2022-03-01' = {
           value: functionWorkerRuntime
         }
         {
-          name: 'myAccount_COSMOSDB'
-          value: cosmosDBConnectionString // need to get this from output of cosmos db file
+          name: settingName
+          value: '@Microsoft.KeyVault(VaultName=${kvName};SecretName=${secretName})'
         }
         {
           name: 'AzureWebJobsFeatureFlags'
@@ -84,10 +80,6 @@ resource crcFunc 'Microsoft.Web/sites@2022-03-01' = {
         {
           name: 'APPLICATIONINSIGHTS_CONNECTION_STRING'
           value: applicationInsights.properties.ConnectionString
-        }
-        { 
-          name: 'WEBSITE_RUN_FROM_PACKAGE'
-          value: packageUri
         }
       ]
       //linuxFxVersion:'Python|3.9'
@@ -124,10 +116,10 @@ resource applicationInsights 'Microsoft.Insights/components@2020-02-02' = {
   }
 }
 
-resource functionAppName_ZipDeploy 'Microsoft.Web/sites/extensions@2021-02-01' = {
-  name: '${funcAppName}/ZipDeploy'
-  location: location
-  properties: {
-    packageUri: packageUri
+module accessPolModule 'accesspol.bicep' = {
+  name: 'accessPolDeploy'
+  params: { 
+    guidValue: guidValue
+    managedID: crcFunc.identity.principalId
   }
 }

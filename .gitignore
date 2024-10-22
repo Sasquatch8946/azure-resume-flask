@@ -4,3 +4,4 @@ __pycache__
 .azure
 app_svc/.env
 *.zip
+/iac/*.txt

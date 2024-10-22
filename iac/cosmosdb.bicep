@@ -2,7 +2,7 @@ param location string = resourceGroup().location
 param guidValue string
 param dbName string = 'CloudResume'
 param dbAccountName string = 'cosmosacct${uniqueString(guidValue)}'
-param keyVaultName string
+var keyVaultName = 'kv${guidValue}'
 
 resource cosmosDBAccount 'Microsoft.DocumentDB/databaseAccounts@2022-08-15' = {
   name: dbAccountName
