@@ -81,6 +81,10 @@ resource crcFunc 'Microsoft.Web/sites@2022-03-01' = {
           name: 'APPLICATIONINSIGHTS_CONNECTION_STRING'
           value: applicationInsights.properties.ConnectionString
         }
+        {
+          name: 'WEBSITE_RUN_FROM_PACKAGE'
+          value: '1'
+        }
       ]
       //linuxFxVersion:'Python|3.9'
       ftpsState: 'Disabled'

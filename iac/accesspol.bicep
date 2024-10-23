@@ -7,6 +7,8 @@ resource kv 'Microsoft.KeyVault/vaults@2024-04-01-preview' existing = {
   name: kvName
 }
 
+// helpful link
+// https://www.vanderveer.io/key-vault-access-policy-bicep/
 resource accessPol 'Microsoft.KeyVault/vaults/accessPolicies@2019-09-01' = {
   name: '${kvName}/add'
   properties: {
