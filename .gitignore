@@ -5,3 +5,4 @@ __pycache__
 app_svc/.env
 *.zip
 /iac/*.txt
+/backend/api/local.settings.json
