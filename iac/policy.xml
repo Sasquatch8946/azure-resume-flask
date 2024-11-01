@@ -1,0 +1,19 @@
+<policies>
+    <inbound>
+	<base />
+	<set-backend-service backend-id="crcfunchc92qim674lknzw" />
+        <set-query-parameter name="code" exists-action="override">
+	  <value>{{'azresume-kv-ref'}}</value>
+        </set-query-parameter>
+	<rate-limit calls="20" renewal-period="90" remaining-calls-variable-name="remainingCallsPerSubscription" />
+    </inbound>
+    <backend>
+	<base />
+    </backend>
+    <outbound>
+	<base />
+    </outbound>
+    <on-error>
+	<base />
+    </on-error>
+</policies>

@@ -1,0 +1,179 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+  "contentVersion": "1.0.0.0",
+  "metadata": {
+    "_generator": {
+      "name": "bicep",
+      "version": "0.29.47.4906",
+      "templateHash": "8095091242798623868"
+    }
+  },
+  "parameters": {
+    "location": {
+      "type": "string",
+      "defaultValue": "centralus"
+    },
+    "guidValue": {
+      "type": "string"
+    },
+    "apimServiceName": {
+      "type": "string",
+      "defaultValue": "[format('apim{0}', parameters('guidValue'))]"
+    }
+  },
+  "variables": {
+    "publisherName": "Sean Chapman",
+    "namedValueName": "azresume-keyvault-ref"
+  },
+  "resources": [
+    {
+      "type": "Microsoft.ApiManagement/service",
+      "apiVersion": "2023-09-01-preview",
+      "name": "[parameters('apimServiceName')]",
+      "location": "[parameters('location')]",
+      "sku": {
+        "name": "Consumption",
+        "capacity": 0
+      },
+      "identity": {
+        "type": "SystemAssigned"
+      },
+      "properties": {
+        "publisherEmail": "schapman684@gmail.com",
+        "publisherName": "[variables('publisherName')]"
+      }
+    },
+    {
+      "type": "Microsoft.ApiManagement/service/apis",
+      "apiVersion": "2023-09-01-preview",
+      "name": "[format('{0}/{1}', parameters('apimServiceName'), 'hello')]",
+      "properties": {
+        "displayName": "[format('crcfunc{0}', parameters('guidValue'))]",
+        "description": "[format('Import from ''crcFunc{0}'' function app.', parameters('guidValue'))]",
+        "path": "hello",
+        "subscriptionRequired": true,
+        "protocols": [
+          "https"
+        ]
+      },
+      "dependsOn": [
+        "[resourceId('Microsoft.ApiManagement/service', parameters('apimServiceName'))]"
+      ]
+    },
+    {
+      "type": "Microsoft.ApiManagement/service/backends",
+      "apiVersion": "2023-09-01-preview",
+      "name": "[format('{0}/{1}', parameters('apimServiceName'), format('crcfunc{0}', parameters('guidValue')))]",
+      "properties": {
+        "protocol": "http",
+        "url": "[format('https://crcfunc{0}.azureweb', parameters('guidValue'))]",
+        "resourceId": "[resourceId('Microsoft.Web/sites/functions', split(format('crcfunc{0}', parameters('guidValue')), '/')[0], split(format('crcfunc{0}', parameters('guidValue')), '/')[1])]",
+        "credentials": {
+          "header": {
+            "x-functions-key": [
+              "[format('{{{{{{crcfunc{0}-key}}}}}}', parameters('guidValue'))]"
+            ]
+          }
+        }
+      },
+      "dependsOn": [
+        "[resourceId('Microsoft.ApiManagement/service', parameters('apimServiceName'))]"
+      ]
+    },
+    {
+      "type": "Microsoft.KeyVault/vaults/accessPolicies",
+      "apiVersion": "2021-06-01-preview",
+      "name": "[format('{0}/{1}', format('kv{0}', parameters('guidValue')), 'add')]",
+      "properties": {
+        "accessPolicies": [
+          {
+            "objectId": "[reference(resourceId('Microsoft.ApiManagement/service', parameters('apimServiceName')), '2023-09-01-preview', 'full').identity.principalId]",
+            "tenantId": "[reference(resourceId('Microsoft.ApiManagement/service', parameters('apimServiceName')), '2023-09-01-preview', 'full').identity.tenantId]",
+            "permissions": {
+              "keys": [],
+              "secrets": [
+                "list",
+                "get"
+              ],
+              "certificates": []
+            }
+          }
+        ]
+      },
+      "dependsOn": [
+        "[resourceId('Microsoft.ApiManagement/service', parameters('apimServiceName'))]"
+      ]
+    },
+    {
+      "type": "Microsoft.ApiManagement/service/namedValues",
+      "apiVersion": "2023-09-01-preview",
+      "name": "[format('{0}/{1}', parameters('apimServiceName'), 'azresume-keyvault-ref')]",
+      "properties": {
+        "displayName": "azresume-keyvault-ref",
+        "keyVault": {
+          "secretIdentifier": "[format('{0}secrets/azresume-func-key', reference(resourceId('Microsoft.KeyVault/vaults', format('kv{0}', parameters('guidValue'))), '2024-04-01-preview').vaultUri)]"
+        },
+        "secret": true
+      },
+      "dependsOn": [
+        "[resourceId('Microsoft.ApiManagement/service', parameters('apimServiceName'))]"
+      ]
+    },
+    {
+      "type": "Microsoft.ApiManagement/service/namedValues",
+      "apiVersion": "2023-09-01-preview",
+      "name": "[format('{0}/{1}', parameters('apimServiceName'), format('crcfunc{0}-key', parameters('guidValue')))]",
+      "properties": {
+        "displayName": "[format('crcfunc{0}-key', parameters('guidValue'))]",
+        "tags": [
+          "key",
+          "function",
+          "auto"
+        ],
+        "secret": true
+      },
+      "dependsOn": [
+        "[resourceId('Microsoft.ApiManagement/service', parameters('apimServiceName'))]"
+      ]
+    },
+    {
+      "type": "Microsoft.ApiManagement/service/products",
+      "apiVersion": "2023-09-01-preview",
+      "name": "[format('{0}/{1}', parameters('apimServiceName'), format('crcfunc{0}-product', parameters('guidValue')))]",
+      "properties": {
+        "displayName": "[format('crcfunc{0}-product', parameters('guidValue'))]",
+        "description": "Hope this works.",
+        "subscriptionRequired": false,
+        "state": "published"
+      },
+      "dependsOn": [
+        "[resourceId('Microsoft.ApiManagement/service', parameters('apimServiceName'))]"
+      ]
+    },
+    {
+      "type": "Microsoft.ApiManagement/service/apis/operations",
+      "apiVersion": "2023-09-01-preview",
+      "name": "[format('{0}/{1}/{2}', parameters('apimServiceName'), 'hello', 'getcloudresumecount')]",
+      "properties": {
+        "displayName": "getCloudResumeCount",
+        "method": "GET",
+        "urlTemplate": "/hello"
+      },
+      "dependsOn": [
+        "[resourceId('Microsoft.ApiManagement/service/apis', parameters('apimServiceName'), 'hello')]"
+      ]
+    },
+    {
+      "type": "Microsoft.ApiManagement/service/policies",
+      "apiVersion": "2023-09-01-preview",
+      "name": "[format('{0}/{1}', parameters('apimServiceName'), 'policy')]",
+      "properties": {
+        "value": "[format('<policies>\r\n  <inbound>\r\n    <base />\r\n    <set-backend-service base-url=\"https://crcfunc{0}.azurewebsites.net/api/\" />\r\n    <set-header name=\"x-functions-key\" exists-action=\"append\">\r\n      <value>\"{{{{azresume-keyvault-ref}}}}\"</value>\r\n    </set-header>\r\n    <set-query-parameter name=\"code\" exists-action=\"override\">\r\n      <value>{{{{azresume-kv-ref}}}}</value>\r\n    </set-query-parameter>\r\n    <rate-limit calls=\"20\" renewal-period=\"90\" remaining-calls-variable-name=\"remainingCallsPerSubscription\" />\r\n  </inbound>\r\n  <backend>\r\n    <base />\r\n  </backend>\r\n  <outbound>\r\n    <base />\r\n  </outbound>\r\n  <on-error>\r\n    <base />\r\n  </on-error>\r\n</policies>', parameters('guidValue'))]",
+        "format": "xml"
+      },
+      "dependsOn": [
+        "[resourceId('Microsoft.ApiManagement/service', parameters('apimServiceName'))]"
+      ]
+    }
+  ]
+}

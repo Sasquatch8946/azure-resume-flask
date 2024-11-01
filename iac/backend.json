@@ -1,0 +1,37 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+  "contentVersion": "1.0.0.0",
+  "metadata": {
+    "_generator": {
+      "name": "bicep",
+      "version": "0.29.47.4906",
+      "templateHash": "5590468979600053540"
+    }
+  },
+  "parameters": {
+    "guidValue": {
+      "type": "string"
+    }
+  },
+  "variables": {
+    "apimServiceName": "[format('apim{0}-2', parameters('guidValue'))]"
+  },
+  "resources": [
+    {
+      "type": "Microsoft.ApiManagement/service/backends",
+      "apiVersion": "2017-03-01",
+      "name": "[format('{0}/{1}', variables('apimServiceName'), 'test')]",
+      "properties": {
+        "protocol": "http",
+        "url": "[format('https://crcfunc{0}.azureweb', parameters('guidValue'))]",
+        "resourceId": "[resourceId('Microsoft.Web/sites/functions', split(format('crcfunc{0}', parameters('guidValue')), '/')[0], split(format('crcfunc{0}', parameters('guidValue')), '/')[1])]"
+      }
+    }
+  ],
+  "outputs": {
+    "funcId": {
+      "type": "string",
+      "value": "[resourceId('Microsoft.Web/sites/functions', split(format('crcfunc{0}', parameters('guidValue')), '/')[0], split(format('crcfunc{0}', parameters('guidValue')), '/')[1])]"
+    }
+  }
+}
