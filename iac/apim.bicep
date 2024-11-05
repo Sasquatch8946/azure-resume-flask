@@ -44,7 +44,6 @@ resource api 'Microsoft.ApiManagement/service/apis@2023-09-01-preview' = {
       'https'
     ]
     isCurrent: true
-    subscriptionRequired: true
     subscriptionKeyParameterNames: {
       header: 'Ocp-Apim-Subscription-Key'
       query: 'subscription-key'
@@ -98,19 +97,7 @@ resource namedValue1 'Microsoft.ApiManagement/service/namedValues@2023-09-01-pre
   }
 }
 
-resource namedValue2 'Microsoft.ApiManagement/service/namedValues@2023-09-01-preview' = { 
-  name: 'crcfunc${guidValue}-key'
-  parent: apim
-  properties: {
-    displayName: 'crcfunc${guidValue}-key'
-    tags: [
-      'key'
-      'function'
-      'auto'
-    ]
-    secret: true
-  }
-}
+
 resource apimProduct 'Microsoft.ApiManagement/service/products@2023-09-01-preview' = { 
   name: 'crcfunc${guidValue}-product'
   parent: apim
