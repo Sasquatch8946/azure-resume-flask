@@ -58,16 +58,6 @@ resource api 'Microsoft.ApiManagement/service/apis@2023-09-01-preview' = {
 }
 
 
-resource backend 'Microsoft.ApiManagement/service/backends@2017-03-01' = { 
-  name: func.name
-  parent: apim
-  properties: { 
-    protocol: 'http'
-    url: 'https://${func.name}.azureweb'
-    resourceId: absUrl
-  }
-}
-
 // https://www.mikaelsand.se/2021/12/how-to-deploy-namedvalues-from-keyvault-in-apim-using-bicep/
 
 resource KeyVaultSetting 'Microsoft.KeyVault/vaults/accessPolicies@2021-06-01-preview' = {
