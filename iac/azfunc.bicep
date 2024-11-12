@@ -127,3 +127,5 @@ module accessPolModule 'accesspol.bicep' = {
     managedID: crcFunc.identity.principalId
   }
 }
+
+output url string = '${crcFunc.properties.defaultHostName}/api'

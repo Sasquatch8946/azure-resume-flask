@@ -12,7 +12,11 @@ resource kv 'Microsoft.KeyVault/vaults@2024-04-01-preview' existing = {
   name: 'kv${guidValue}'
 }
 
-resource func 'Microsoft.Web/sites/functions@2023-12-01' existing = { 
+resource func 'Microsoft.Web/sites/functions@2021-03-01' existing = { 
+  name: 'crcfunc${guidValue}'
+}
+
+resource funcApp 'Microsoft.Web/sites@2023-12-01' existing = { 
   name: 'crcfunc${guidValue}'
 }
 
@@ -30,6 +34,7 @@ resource apim 'Microsoft.ApiManagement/service@2023-09-01-preview' = {
     publisherEmail: 'schapman684@gmail.com'
     publisherName: publisherName
   }
+
 }
 
 resource api 'Microsoft.ApiManagement/service/apis@2023-09-01-preview' = { 
@@ -48,6 +53,7 @@ resource api 'Microsoft.ApiManagement/service/apis@2023-09-01-preview' = {
       header: 'Ocp-Apim-Subscription-Key'
       query: 'subscription-key'
       }
+    serviceUrl: 'https://${funcApp.properties.defaultHostName}/api'
   }
 }
 
