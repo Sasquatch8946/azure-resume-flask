@@ -2,18 +2,10 @@ param location string = 'centralus'
 param guidValue string
 var publisherName = 'Sean Chapman'
 param apimServiceName string = 'apim${guidValue}'
-var namedValueName = 'azresume-keyvault-ref'
-var rId = resourceId(resourceGroup().name, 'Microsoft.Web/sites', func.name)
-var mgmtApi = environment().resourceManager
-var myUri = '${environment().resourceManager}${rId}'
-var absUrl = uri(mgmtApi, rId)
+var subscriptionName = 'azresume'
 
 resource kv 'Microsoft.KeyVault/vaults@2024-04-01-preview' existing = { 
   name: 'kv${guidValue}'
-}
-
-resource func 'Microsoft.Web/sites/functions@2021-03-01' existing = { 
-  name: 'crcfunc${guidValue}'
 }
 
 resource funcApp 'Microsoft.Web/sites@2023-12-01' existing = { 
@@ -99,9 +91,16 @@ resource apimProduct 'Microsoft.ApiManagement/service/products@2023-09-01-previe
   parent: apim
   properties: { 
     displayName: 'crcfunc${guidValue}-product'
-    subscriptionRequired: false 
+    subscriptionRequired: true 
     state: 'published'
+    description: 'for Azure app service to use to call function api'
   }
+
+}
+
+resource apimProductApi 'Microsoft.ApiManagement/service/products/apis@2023-09-01-preview' = { 
+  name: api.name
+  parent: apimProduct
 }
 
 resource apiOperation 'Microsoft.ApiManagement/service/apis/operations@2023-09-01-preview' = { 
@@ -120,6 +119,15 @@ resource apimPolicy 'Microsoft.ApiManagement/service/apis/operations/policies@20
   properties: {                                                        
     value: loadTextContent('./policy.xml') 
     format: 'rawxml'
+  }
+}
+
+resource productSubscription 'Microsoft.ApiManagement/service/subscriptions@2023-09-01-preview' = { 
+  name: subscriptionName
+  properties: { 
+     displayName: subscriptionName
+     scope: '/products/${apimProduct}'
+     state: 'active'
   }
 }
 
