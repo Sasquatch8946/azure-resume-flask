@@ -3,6 +3,7 @@ param guidValue string
 var publisherName = 'Sean Chapman'
 param apimServiceName string = 'apim${guidValue}'
 var subscriptionName = 'azresume'
+var keyVaultName = 'kv${guidValue}'
 
 resource kv 'Microsoft.KeyVault/vaults@2024-04-01-preview' existing = { 
   name: 'kv${guidValue}'
@@ -130,4 +131,24 @@ resource productSubscription 'Microsoft.ApiManagement/service/subscriptions@2023
      state: 'active'
   }
 }
+
+module accessPolModule 'accesspol.bicep' = {
+  name: 'accessPolDeploy'
+  params: { 
+    guidValue: guidValue
+    managedID: apim.identity.principalId
+  }
+}
+
+module secretModule './kvsecret.bicep' = {
+  name: 'apimSubUrl'
+  params: {
+    secretName: '${keyVaultName}/apimSubUrl'
+    secretValue: 'https://${apim.name}.azure-api.net/hello/hello?subscription-key=${productSubscription.listSecrets().primaryKey}'
+  }
+
+}
+
+output apiPath string = api.properties.path
+
 
