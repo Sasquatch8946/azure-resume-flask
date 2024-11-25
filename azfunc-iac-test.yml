@@ -73,8 +73,7 @@ stages:
     
     - task: PowerShell@2
       displayName: 'Generate guid for deployment'
-      inputs:
-       targetType: inline
-       script: |
-         Write-Host "GUID VAR: ${env:GUID}"
+    
+    - powershell: |
+          Write-Host "guid var: ${env:GUID}"
       
