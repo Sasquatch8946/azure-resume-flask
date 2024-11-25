@@ -70,9 +70,7 @@ stages:
     #     pip install pytest pytest-azurepipelines azure-functions
     #     python -m pytest tests
     #   workingDirectory: $(workingDirectory)
-    
-    - task: PowerShell@2
-      displayName: 'Generate guid for deployment'
+
     
     - powershell: |
           Write-Host "guid var: ${env:GUID}"
