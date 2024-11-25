@@ -76,5 +76,5 @@ stages:
       inputs:
        targetType: inline
        script: |
-         Write-Host "GUID VAR: ${env:GUID}""
+         Write-Host "GUID VAR: ${env:GUID}"
       
