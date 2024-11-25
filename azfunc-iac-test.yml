@@ -76,12 +76,7 @@ stages:
       inputs:
        targetType: inline
        script: |
-         Write-Host "current directory:"
-         Get-Location
-         Write-Host "is .\iac\New-GuidForDeployment.ps1 a valid path?"
-         Test-Path -Path ".\iac\New-GuidForDeployment.ps1"
-         .\iac\New-GuidForDeployment.ps1
-         Write-Host "##vso[task.setvariable variable=value;isoutput=true].\iac\New-GuidForDeployment.ps1"
+         Write-Host ${env:GUID}
       
     - powershell: |
         pwd
