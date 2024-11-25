@@ -72,6 +72,8 @@ stages:
     #   workingDirectory: $(workingDirectory)
     
     - task: AzurePowerShell@5
+      env:
+        GUID: $(GUID)
       displayName: 'run az posh commands'
       inputs: 
          azureSubscription: 'test-iac'
