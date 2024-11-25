@@ -78,6 +78,3 @@ stages:
        script: |
          Write-Host ${env:GUID}
       
-    - powershell: |
-        pwd
-        Write-Host $(guid)
