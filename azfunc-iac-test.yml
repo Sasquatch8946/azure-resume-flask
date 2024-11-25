@@ -75,6 +75,7 @@ stages:
       displayName: 'run az posh commands'
       inputs: 
          azureSubscription: 'test-iac'
+         azurePowerShellVersion: LatestVersion
          scriptType: 'InlineScript'
          Inline: |
              Get-AzKeyVault -ResourceGroupName 'azureresume'
