@@ -78,7 +78,7 @@ stages:
          azurePowerShellVersion: LatestVersion
          scriptType: 'InlineScript'
          Inline: |
-             Get-AzKeyVault -ResourceGroupName 'azureresume'
+             Get-AzKeyVault -ResourceGroupName "azureresume" -Name "kv${env:GUID}"
 
 
       
