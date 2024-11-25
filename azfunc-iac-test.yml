@@ -70,9 +70,14 @@ stages:
     #     pip install pytest pytest-azurepipelines azure-functions
     #     python -m pytest tests
     #   workingDirectory: $(workingDirectory)
-
     
-    - powershell: |
-          Write-Host "guid var: ${env:GUID}"
-          Write-Host "test var: ${env:TEST}"
+    - task: AzurePowerShell@5
+      displayName: 'run az posh commands'
+      inputs: 
+         azureSubscription: 'test-iac'
+         scriptType: 'InlineScript'
+         Inline: |
+             Get-AzKeyVault -ResourceGroupName 'azureresume'
+
+
       
