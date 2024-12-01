@@ -11,6 +11,20 @@ resource cosmosDBAccount 'Microsoft.DocumentDB/databaseAccounts@2022-08-15' = {
   properties: {
     databaseAccountOfferType: 'Standard'
     publicNetworkAccess: 'Enabled'
+    enableFreeTier: true
+    capabilities: [
+      { 
+        name: 'EnableServerless'
+      }
+    ]
+    locations: [
+      { 
+        locationName: location
+        failoverPriority: 0
+        isZoneRedundant: false
+      }
+
+    ]
   }
 }
 
@@ -19,7 +33,6 @@ resource cosmosDB 'Microsoft.DocumentDB/databaseAccounts/sqlDatabases@2022-08-15
   name: dbName // need to review error message
   parent: cosmosDBAccount
   properties: {
-    enableFreeTier: true
     resource: {
       id: dbName //id has to match with name above and be globally unique?
     }

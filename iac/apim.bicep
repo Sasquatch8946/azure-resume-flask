@@ -125,9 +125,10 @@ resource apimPolicy 'Microsoft.ApiManagement/service/apis/operations/policies@20
 
 resource productSubscription 'Microsoft.ApiManagement/service/subscriptions@2023-09-01-preview' = { 
   name: subscriptionName
+  parent: apim
   properties: { 
      displayName: subscriptionName
-     scope: '/products/${apimProduct}'
+     scope: '/products/${apimProduct.id}'
      state: 'active'
   }
 }
@@ -148,7 +149,5 @@ module secretModule './kvsecret.bicep' = {
   }
 
 }
-
-output apiPath string = api.properties.path
 
 
