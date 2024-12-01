@@ -1,4 +1,4 @@
-param location string = resourceGroup().location
+param location string = 'centralus'
 param guidValue string
 
 resource keyVault 'Microsoft.KeyVault/vaults@2023-07-01' = {

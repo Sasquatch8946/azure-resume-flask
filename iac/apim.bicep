@@ -51,29 +51,6 @@ resource api 'Microsoft.ApiManagement/service/apis@2023-09-01-preview' = {
 }
 
 
-// https://www.mikaelsand.se/2021/12/how-to-deploy-namedvalues-from-keyvault-in-apim-using-bicep/
-
-resource KeyVaultSetting 'Microsoft.KeyVault/vaults/accessPolicies@2021-06-01-preview' = {
-  name: 'add'
-  parent: kv
-  properties: {
-    accessPolicies: [
-      {
-        objectId: apim.identity.principalId
-        tenantId: apim.identity.tenantId
-        permissions: {
-          keys: []
-          secrets: [
-            'list'
-            'get'
-          ]
-          certificates: []
-        }
-      }
-    ]
-  }
-}
-
 resource namedValue1 'Microsoft.ApiManagement/service/namedValues@2023-09-01-preview' = { 
   name: 'azresume-keyvault-ref'
   parent: apim

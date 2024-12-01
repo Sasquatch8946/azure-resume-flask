@@ -1,4 +1,4 @@
-param location string = resourceGroup().location
+param location string = 'centralus'
 param guidValue string
 param dbName string = 'CloudResume'
 param dbAccountName string = 'cosmosacct${uniqueString(guidValue)}'
