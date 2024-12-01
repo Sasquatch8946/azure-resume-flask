@@ -51,19 +51,6 @@ resource api 'Microsoft.ApiManagement/service/apis@2023-09-01-preview' = {
 }
 
 
-resource namedValue1 'Microsoft.ApiManagement/service/namedValues@2023-09-01-preview' = { 
-  name: 'azresume-keyvault-ref'
-  parent: apim
-  properties: { 
-    displayName: 'azresume-keyvault-ref'
-    keyVault: { 
-      secretIdentifier: '${kv.properties.vaultUri}secrets/azresume-func-key'
-    }
-    secret: true
-  }
-}
-
-
 resource apimProduct 'Microsoft.ApiManagement/service/products@2023-09-01-preview' = { 
   name: 'crcfunc${guidValue}-product'
   parent: apim
