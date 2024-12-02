@@ -1,11 +1,6 @@
 param guidValue string
 var kvName = 'kv${guidValue}'
-param accessPolName string = 'kvAccessPol'
 param managedID string
-
-resource kv 'Microsoft.KeyVault/vaults@2024-04-01-preview' existing = {
-  name: kvName
-}
 
 // helpful link
 // https://www.vanderveer.io/key-vault-access-policy-bicep/
