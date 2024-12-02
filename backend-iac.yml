@@ -76,10 +76,8 @@ stages:
       inputs: 
          azureSubscription: 'test-iac'
          azurePowerShellVersion: LatestVersion
-         scriptType: 'InlineScript'
-         Inline: |
-             Write-Host "GUID var: ${env:GUID}"
-             Get-AzKeyVault -ResourceGroupName "azureresume" -Name "kv${env:GUID}"
+         scriptType: 'FilePath'
+         ScriptPath: '/iac/deploy.ps1'
 
 
       
