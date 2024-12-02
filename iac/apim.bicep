@@ -5,10 +5,6 @@ param apimServiceName string = 'apim${guidValue}'
 var subscriptionName = 'azresume'
 var keyVaultName = 'kv${guidValue}'
 
-resource kv 'Microsoft.KeyVault/vaults@2024-04-01-preview' existing = { 
-  name: 'kv${guidValue}'
-}
-
 resource funcApp 'Microsoft.Web/sites@2023-12-01' existing = { 
   name: 'crcfunc${guidValue}'
 }
