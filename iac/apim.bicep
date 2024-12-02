@@ -74,15 +74,6 @@ resource apiOperation 'Microsoft.ApiManagement/service/apis/operations@2023-09-0
   }
 }
 
-resource apimPolicy 'Microsoft.ApiManagement/service/apis/operations/policies@2023-09-01-preview' = { 
-  name: 'policy'
-  parent: apiOperation  
-  properties: {                                                        
-    value: loadTextContent('./policy.xml') 
-    format: 'rawxml'
-  }
-}
-
 resource productSubscription 'Microsoft.ApiManagement/service/subscriptions@2023-09-01-preview' = { 
   name: subscriptionName
   parent: apim
