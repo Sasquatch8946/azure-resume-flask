@@ -1,5 +1,5 @@
 param guidValue string
-param apimServiceName string = 'apim${guidValue}-3'
+param apimServiceName string = 'apim${guidValue}' 
 
 resource apim 'Microsoft.ApiManagement/service@2023-09-01-preview' existing = { 
   name: apimServiceName
