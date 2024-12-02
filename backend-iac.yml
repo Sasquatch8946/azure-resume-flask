@@ -78,8 +78,8 @@ stages:
          azurePowerShellVersion: LatestVersion
          scriptType: 'InlineScript'
          Inline: |
-             Write-Host "GUID var: ${env:GUID2}"
-             Get-AzKeyVault -ResourceGroupName "azureresume" -Name "kv${env:GUID2}"
+             Write-Host "GUID var: ${env:GUID}"
+             Get-AzKeyVault -ResourceGroupName "azureresume" -Name "kv${env:GUID}"
 
 
       
