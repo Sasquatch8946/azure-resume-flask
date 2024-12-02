@@ -6,7 +6,7 @@
 trigger:
   branches:
     include:
-      - modular
+      - modular3
   paths:
     include:
       - backend/api
