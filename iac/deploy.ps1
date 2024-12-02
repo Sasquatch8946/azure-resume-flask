@@ -16,13 +16,31 @@ $kv = Get-AzKeyVault -ResourceGroupName $rg -VaultName $kvName
 if (-Not($kv))
 {
     Write-Host "Key vault not found. Deploying..."
-    $deploy = New-AzResourceGroupDeployment -ResourceGroupName $rg -TemplateFile "$PSScriptRoot/keyvault.bicep"
+    $deploy = New-AzResourceGroupDeployment -ResourceGroupName $rg -TemplateFile "$PSScriptRoot/keyvault.bicep" -TemplateParameterObject @{"guidValue"=$guidValue}
     $deployOutputs
 }
 else  
 {
     Write-Host "Key vault already exists."
 }
+$cosmos = Get-AzCosmosDBAccount -ResourceGroupName 'azureresume'
+if (-Not($cosmos))
+{
+	$deploy2 = New-AzResourceGroupDeployment -ResourceGroupName $rg -TemplateFile "$PSScriptRoot/cosmosdb.bicep" 
+	$deploy2.Outputs
+}
+else
+{
+	Write-Host "Cosmos DB already exists."
+}
 
-$deploy2 = New-AzResourceGroupDeployment -ResourceGroupName $rg -TemplateFile "$PSScriptRoot/main.bicep" -TemplateParameterFile "$PSScriptRoot/main.bicepparam"
-$deploy2.Outputs
+$functionApp = Get-AzFunctionApp -ResourceGroupName 'azureresume'
+if (-Not($functionApp))
+{
+	$deploy3 = New-AzResourceGroupDeployment -ResourceGroupName $rg -TemplateFile "$PSScriptRoot/azfunc.bicep" 
+	$deploy3.Outputs
+}
+else
+{
+	Write-Host "Function app already exists."
+}
