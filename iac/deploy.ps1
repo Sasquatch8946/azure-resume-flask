@@ -1,6 +1,6 @@
 Param
 (
-    [string]$guidValue
+    [string]$guidValue=${env:GUID}
 )
 $kvName = 'kv' + $guidValue
 # if key vault not exist, create
