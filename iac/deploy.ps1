@@ -22,7 +22,7 @@ else
 $cosmos = Get-AzCosmosDBAccount -ResourceGroupName 'azureresume'
 if (-Not($cosmos))
 {
-	$deploy2 = New-AzResourceGroupDeployment -ResourceGroupName $rg -TemplateFile "$PSScriptRoot/cosmosdb.bicep" 
+	$deploy2 = New-AzResourceGroupDeployment -ResourceGroupName $rg -TemplateFile "$PSScriptRoot/cosmosdb.bicep" -TemplateParameterObject @{"guidValue"=$guidValue} 
 	$deploy2.Outputs
 }
 else
@@ -33,7 +33,7 @@ else
 $functionApp = Get-AzFunctionApp -ResourceGroupName 'azureresume'
 if (-Not($functionApp))
 {
-	$deploy3 = New-AzResourceGroupDeployment -ResourceGroupName $rg -TemplateFile "$PSScriptRoot/azfunc.bicep" 
+	$deploy3 = New-AzResourceGroupDeployment -ResourceGroupName $rg -TemplateFile "$PSScriptRoot/azfunc.bicep" -TemplateParameterObject @{"guidValue"=$guidValue}
 	$deploy3.Outputs
 }
 else
