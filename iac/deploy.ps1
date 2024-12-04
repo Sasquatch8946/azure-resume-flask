@@ -22,6 +22,7 @@ else
 $cosmos = Get-AzCosmosDBAccount -ResourceGroupName 'azureresume'
 if (-Not($cosmos))
 {
+	Write-Host "Cosmos DB not found. Deploying..."
 	$deploy2 = New-AzResourceGroupDeployment -ResourceGroupName $rg -TemplateFile "$PSScriptRoot/cosmosdb.bicep" -TemplateParameterObject @{"guidValue"=$guidValue} 
 	$deploy2.Outputs
 }
@@ -33,6 +34,7 @@ else
 $functionApp = Get-AzFunctionApp -ResourceGroupName 'azureresume'
 if (-Not($functionApp))
 {
+	Write-Host "Function app not found. Deploying..."
 	$deploy3 = New-AzResourceGroupDeployment -ResourceGroupName $rg -TemplateFile "$PSScriptRoot/azfunc.bicep" -TemplateParameterObject @{"guidValue"=$guidValue}
 	$deploy3.Outputs
 }
