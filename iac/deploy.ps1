@@ -2,6 +2,7 @@ Param
 (
     [string]$guidValue=${env:GUID}
 )
+Write-Host "GUIDVALUE: $guidValue"
 $kvName = 'kv' + $guidValue
 # if key vault not exist, create
 # else get existing key vault for use in bicep deployment
