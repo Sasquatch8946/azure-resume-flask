@@ -16,7 +16,7 @@ variables:
   azureSubscription: 'test-iac'
 
   # Function app name
-  functionAppName: 'getandupdatecounter'
+  functionAppName: 'crcfunc$(env:GUID)'
 
   # Agent VM image name
   vmImageName: 'ubuntu-latest'
@@ -35,49 +35,50 @@ stages:
       vmImage: $(vmImageName)
 
     steps:
-    # - bash: |
-    #     if [ -f extensions.csproj ]
-    #     then
-    #         dotnet build extensions.csproj --runtime ubuntu.16.04-x64 --output ./bin
-    #     fi
-    #   workingDirectory: $(workingDirectory)
-    #   displayName: 'Build extensions'
-
-    # - task: UsePythonVersion@0
-    #   displayName: 'Use Python 3.10'
-    #   inputs:
-    #     versionSpec: 3.10 # Functions V2 supports Python 3.6 as of today
-
-    # - bash: |
-    #     pip install --target="./.python_packages/lib/site-packages" -r ./requirements.txt
-    #   workingDirectory: $(workingDirectory)
-    #   displayName: 'Install application dependencies'
-
-    # - task: ArchiveFiles@2
-    #   displayName: 'Archive files'
-    #   inputs:
-    #     rootFolderOrFile: '$(workingDirectory)'
-    #     includeRootFolder: false
-    #     archiveType: zip
-    #     archiveFile: $(Build.ArtifactStagingDirectory)/$(Build.BuildId).zip
-    #     replaceExistingArchive: true
-
-    # - publish: $(Build.ArtifactStagingDirectory)/$(Build.BuildId).zip
-    #   artifact: drop
-
-    # - bash: |
-    #     pwd
-    #     pip install pytest pytest-azurepipelines azure-functions
-    #     python -m pytest tests
-    #   workingDirectory: $(workingDirectory)
-    
     - task: AzurePowerShell@5
-      displayName: 'run az posh commands'
+      displayName: 'Deploy resources if not exists'
       inputs: 
          azureSubscription: 'test-iac'
          azurePowerShellVersion: LatestVersion
          scriptType: 'FilePath'
          ScriptPath: '$(Build.SourcesDirectory)/iac/deploy.ps1'
+         
+    - bash: |
+        if [ -f extensions.csproj ]
+        then
+            dotnet build extensions.csproj --runtime ubuntu.16.04-x64 --output ./bin
+        fi
+      workingDirectory: $(workingDirectory)
+      displayName: 'Build extensions'
+
+    - task: UsePythonVersion@0
+      displayName: 'Use Python 3.10'
+      inputs:
+        versionSpec: 3.10 # Functions V2 supports Python 3.6 as of today
+
+    - bash: |
+        pip install --target="./.python_packages/lib/site-packages" -r ./requirements.txt
+      workingDirectory: $(workingDirectory)
+      displayName: 'Install application dependencies'
+
+    - task: ArchiveFiles@2
+      displayName: 'Archive files'
+      inputs:
+        rootFolderOrFile: '$(workingDirectory)'
+        includeRootFolder: false
+        archiveType: zip
+        archiveFile: $(Build.ArtifactStagingDirectory)/$(Build.BuildId).zip
+        replaceExistingArchive: true
+
+    - publish: $(Build.ArtifactStagingDirectory)/$(Build.BuildId).zip
+      artifact: drop
+
+    - bash: |
+        pwd
+        pip install pytest pytest-azurepipelines azure-functions
+        python -m pytest tests
+      workingDirectory: $(workingDirectory)
+    
 
 
       
