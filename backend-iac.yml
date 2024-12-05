@@ -36,12 +36,12 @@ stages:
 
     steps:
     - task: AzurePowerShell@5
-      displayName: 'Deploy resources if not exists'
+      displayName: 'Deploy Key Vault, Cosmos DB, and Function App'
       inputs: 
          azureSubscription: 'test-iac'
          azurePowerShellVersion: LatestVersion
          scriptType: 'FilePath'
-         ScriptPath: '$(Build.SourcesDirectory)/iac/deploy.ps1'
+         ScriptPath: '$(Build.SourcesDirectory)/iac/deploy_stage_1.ps1'
          
     - bash: |
         if [ -f extensions.csproj ]
@@ -78,6 +78,14 @@ stages:
         pip install pytest pytest-azurepipelines azure-functions
         python -m pytest tests
       workingDirectory: $(workingDirectory)
+
+    - task: AzurePowerShell@5
+      displayName: 'Deploy APIM'
+      inputs: 
+         azureSubscription: 'test-iac'
+         azurePowerShellVersion: LatestVersion
+         scriptType: 'FilePath'
+         ScriptPath: '$(Build.SourcesDirectory)/iac/deploy_stage_2.ps1'
     
 
 
