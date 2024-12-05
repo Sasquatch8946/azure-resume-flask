@@ -79,6 +79,12 @@ stages:
         python -m pytest tests
       workingDirectory: $(workingDirectory)
 
+    - task: AzureCLI@2
+      displayName: "Store function app keys in key vault"
+      inputs:
+        azureSubscription: 'test-iac'
+        scriptType: ps
+        scriptPath: '$(Build.SourcesDirectory)/iac/Get-FunctionAppKeys.ps1'
     - task: AzurePowerShell@5
       displayName: 'Deploy APIM'
       inputs: 
