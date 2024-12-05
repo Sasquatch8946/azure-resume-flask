@@ -1,5 +1,5 @@
 # This script gets azure function function key and stores it in keyvault for the API Management service to use later.
-$guidValue = gc .\guid.txt
+$guidValue = ${env:GUID}
 
 $secret = az functionapp keys list -n "crcfunc$guidValue" -g 'azureresume' | ConvertFrom-Json | select -expand  functionKeys | select -expand default
 
