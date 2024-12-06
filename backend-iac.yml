@@ -16,7 +16,7 @@ variables:
   azureSubscription: 'test-iac'
 
   # Function app name
-  functionAppName: 'crcfunc$(env:GUID)'
+  functionAppName: 'crcfunc$(GUID)'
 
   # Agent VM image name
   vmImageName: 'ubuntu-latest'
