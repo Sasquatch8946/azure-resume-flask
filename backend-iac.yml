@@ -133,10 +133,7 @@ stages:
           steps:
           - download: current
             artifact: dropScripts
-          - task: PowerShell@2
-            inputs:
-            # this should be the script path below, ja?
-              filePath: '$(Pipeline.Workspace)/dropScripts/script20.ps1'
+
           - task: AzureCLI@2
             displayName: "Store function app keys in key vault"
             inputs:
