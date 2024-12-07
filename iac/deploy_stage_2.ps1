@@ -35,5 +35,5 @@ if (-Not($namedValue))
 }
 else  
 {
-    Write-Host "API management service already exists."
+    Write-Host "API management named value already exists."
 }
