@@ -136,13 +136,13 @@ stages:
           - task: PowerShell@2
             inputs:
             # this should be the script path below, ja?
-              filePath: '$(Pipeline.Workspace)\dropScripts\script20.ps1'
+              filePath: '$(Pipeline.Workspace)/dropScripts/script20.ps1'
           - task: AzureCLI@2
             displayName: "Store function app keys in key vault"
             inputs:
               azureSubscription: 'test-iac'
               scriptType: pscore
-              scriptPath: '$(Build.SourcesDirectory)/iac/Get-FunctionAppKeys.ps1'
+              scriptPath: '$(Pipeline.Workspace)/dropScripts/Get-FunctionAppKeys.ps1'
     
           - task: AzurePowerShell@5
             displayName: 'Deploy APIM'
@@ -150,4 +150,4 @@ stages:
               azureSubscription: 'test-iac'
               azurePowerShellVersion: LatestVersion
               scriptType: 'FilePath'
-              ScriptPath: '$(Post_Deployment.SourcesDirectory)/iac/deploy_stage_2.ps1'
+              ScriptPath: '$(Pipeline.Workspace)/dropScripts/deploy_stage_2.ps1'
