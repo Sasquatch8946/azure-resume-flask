@@ -134,4 +134,4 @@ stages:
               azureSubscription: 'test-iac'
               azurePowerShellVersion: LatestVersion
               scriptType: 'FilePath'
-              ScriptPath: '$(Build.SourcesDirectory)/iac/deploy_stage_2.ps1'
+              ScriptPath: '$(Post_Deployment.SourcesDirectory)/iac/deploy_stage_2.ps1'
