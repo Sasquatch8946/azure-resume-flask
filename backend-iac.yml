@@ -16,7 +16,7 @@ variables:
   azureSubscription: 'test-iac'
 
   # Function app name
-  functionAppName: 'crcfunc$(env:GUID)'
+  functionAppName: 'crcfunc$(GUID)'
 
   # Agent VM image name
   vmImageName: 'ubuntu-latest'
@@ -42,7 +42,16 @@ stages:
          azurePowerShellVersion: LatestVersion
          scriptType: 'FilePath'
          ScriptPath: '$(Build.SourcesDirectory)/iac/deploy_stage_1.ps1'
-         
+    
+    - task: CopyFiles@2
+      displayName: 'Copy powershell scripts for later use in the pipeline'
+      inputs:
+        contents: 'iac/**'
+        targetFolder: '$(Build.ArtifactStagingDirectory)'
+    - publish: '$(Build.ArtifactStagingDirectory)/iac'
+      displayName: 'Publish powershell and bicep scripts for later use'
+      artifact: dropScripts
+
     - bash: |
         if [ -f extensions.csproj ]
         then
@@ -79,20 +88,63 @@ stages:
         python -m pytest tests
       workingDirectory: $(workingDirectory)
 
-    - task: AzureCLI@2
-      displayName: "Store function app keys in key vault"
-      inputs:
-        azureSubscription: 'test-iac'
-        scriptType: pscore
-        scriptPath: '$(Build.SourcesDirectory)/iac/Get-FunctionAppKeys.ps1'
-    - task: AzurePowerShell@5
-      displayName: 'Deploy APIM'
-      inputs: 
-         azureSubscription: 'test-iac'
-         azurePowerShellVersion: LatestVersion
-         scriptType: 'FilePath'
-         ScriptPath: '$(Build.SourcesDirectory)/iac/deploy_stage_2.ps1'
-    
-
-
       
+- stage: Deploy
+  displayName: Deploy stage
+  dependsOn: Build
+  condition: succeeded()
+
+  jobs:
+  - deployment: Deploy
+    displayName: Deploy
+    environment: 'development'
+    pool:
+      vmImage: $(vmImageName)
+
+    strategy:
+      runOnce:
+        deploy:
+
+          steps:
+          - task: AzureFunctionApp@1
+            displayName: 'Azure functions app deploy'
+            inputs:
+              azureSubscription: '$(azureSubscription)'
+              appType: functionAppLinux
+              appName: $(functionAppName)
+              package: '$(Pipeline.Workspace)/drop/$(Build.BuildId).zip'
+
+- stage: Post_Deployment
+  displayName: Post_Deployment Stage
+  dependsOn: Deploy
+  condition: succeeded()
+
+  jobs:
+  - deployment: Post_Deployment
+    displayName: Post_Deployment Resource Creation
+    environment: 'development'
+    pool:
+      vmImage: $(vmImageName)
+
+    strategy:
+      runOnce:
+        deploy:
+
+          steps:
+          - download: current
+            artifact: dropScripts
+
+          - task: AzureCLI@2
+            displayName: "Store function app keys in key vault"
+            inputs:
+              azureSubscription: 'test-iac'
+              scriptType: pscore
+              scriptPath: '$(Pipeline.Workspace)/dropScripts/Get-FunctionAppKeys.ps1'
+    
+          - task: AzurePowerShell@5
+            displayName: 'Deploy APIM'
+            inputs: 
+              azureSubscription: 'test-iac'
+              azurePowerShellVersion: LatestVersion
+              scriptType: 'FilePath'
+              ScriptPath: '$(Pipeline.Workspace)/dropScripts/deploy_stage_2.ps1'
