@@ -42,7 +42,16 @@ stages:
          azurePowerShellVersion: LatestVersion
          scriptType: 'FilePath'
          ScriptPath: '$(Build.SourcesDirectory)/iac/deploy_stage_1.ps1'
-         
+    
+    - task: CopyFiles@2
+      displayName: 'Copy powershell scripts for later use in the pipeline'
+      inputs:
+        contents: 'iac/**'
+        targetFolder: '$(Build.ArtifactStagingDirectory)'
+    - publish: '$(Build.ArtifactStagingDirectory)/iac'
+      displayName: 'Publish powershell and bicep scripts for later use'
+      artifact: dropScripts
+
     - bash: |
         if [ -f extensions.csproj ]
         then
@@ -122,12 +131,19 @@ stages:
         deploy:
 
           steps:
+          - download: current
+            artifact: dropScripts
+          - task: PowerShell@2
+            inputs:
+            # this should be the script path below, ja?
+              filePath: '$(Pipeline.Workspace)\dropScripts\script20.ps1'
           - task: AzureCLI@2
             displayName: "Store function app keys in key vault"
             inputs:
               azureSubscription: 'test-iac'
               scriptType: pscore
               scriptPath: '$(Build.SourcesDirectory)/iac/Get-FunctionAppKeys.ps1'
+    
           - task: AzurePowerShell@5
             displayName: 'Deploy APIM'
             inputs: 
