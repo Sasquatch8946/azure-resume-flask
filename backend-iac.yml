@@ -50,7 +50,7 @@ stages:
          azurePowerShellVersion: LatestVersion
          scriptType: 'InlineScript'
          Inline: |
-          New-AzResourceGroupDeployment -ResourceGroupName 'azureresume' -TemplateFile "$(Build.SourcesDirectory)/iac/accesspol.bicep" -TemplateParameterObject @{"managedID"="$env:ADOOBJECTID";"secretPerms"=@('Get', 'Set');"guidValue"="$(GUID)"} 
+          New-AzResourceGroupDeployment -ResourceGroupName 'azureresume' -TemplateFile "$(Build.SourcesDirectory)/iac/accesspol.bicep" -TemplateParameterObject @{"managedID"="$env:ADOOBJECTID";"secretPerms"=@('Get', 'Set');"guidValue"="$(GUID)"} | Out-Null
       env: 
          ADOOBJECTID: $(ADOOBJECTID)
 
