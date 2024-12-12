@@ -52,7 +52,7 @@ stages:
          Inline: |
           New-AzResourceGroupDeployment -ResourceGroupName 'azureresume' -TemplateFile "$(Build.SourcesDirectory)/iac/accesspol.bicep" -TemplateParameterObject @{"managedID"="$env:ADOOBJECTID";"secretPerms"=@('Get', 'Set');"guidValue"="$(GUID)"}
       env: 
-         ADOOBJECTID: $(ADOOBJECTID)
+         ADOOBJECTID: $(ADOOBJECTID2)
 
     
     - task: CopyFiles@2
