@@ -42,6 +42,18 @@ stages:
          azurePowerShellVersion: LatestVersion
          scriptType: 'FilePath'
          ScriptPath: '$(Build.SourcesDirectory)/iac/deploy_stage_1.ps1'
+
+    - task: AzurePowerShell@5
+      displayName: 'Give Service Connection perms to key vault'
+      inputs: 
+         azureSubscription: 'test-iac'
+         azurePowerShellVersion: LatestVersion
+         scriptType: 'InlineScript'
+         Inline: |
+          New-AzResourceGroupDeployment -ResourceGroupName 'azureresume' -TemplateFile "$(Build.SourcesDirectory)/iac/accesspol.bicep" -TemplateParameterObject @{"managedID"="$env:ADOOBJECTID";"secretPerms"=@('Get', 'Set');"guidValue"="$(GUID)"}
+      env: 
+         ADOOBJECTID: $(ADOOBJECTID2)
+
     
     - task: CopyFiles@2
       displayName: 'Copy powershell scripts for later use in the pipeline'
