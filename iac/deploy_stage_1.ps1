@@ -49,3 +49,7 @@ if ($env:keyVaultManager)
 	$deploy4 = New-AzResourceGroupDeployment -ResourceGroupName $rg -TemplateFile "$PSScriptRoot/accesspol.bicep" -TemplateParameterObject @{"guidValue"=$guidValue; managedID="$($env:keyVaultManager)"}
 	$deploy4.Outputs
 }
+else 
+{
+	Write-Host "keyVaultManager NOT configured"
+}
