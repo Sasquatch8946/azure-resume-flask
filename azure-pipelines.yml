@@ -18,13 +18,13 @@ variables:
   azureSubscription: 'test-iac'
 
   # Web app name
-  webAppName: 'funcyazureresume'
+  webAppName: 'crcapp$(GUID)'
 
   # Agent VM image name
   vmImageName: 'ubuntu-latest'
 
   # Environment name
-  environmentName: 'crc$(GUID)'
+  environmentName: 'crcapp$(GUID)'
 
   # Project root folder. Point to the folder containing manage.py file.
   projectRoot: $(System.DefaultWorkingDirectory)/app_svc
