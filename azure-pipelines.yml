@@ -15,16 +15,16 @@ trigger:
 
 variables:
   # Azure Resource Manager connection created during pipeline creation
-  azureServiceConnectionId: '02100e5c-3d06-4b90-b5f4-7b948b5d3d6f'
+  azureSubscription: 'test-iac'
 
   # Web app name
-  webAppName: 'funcyazureresume'
+  webAppName: 'crcapp$(GUID)'
 
   # Agent VM image name
   vmImageName: 'ubuntu-latest'
 
   # Environment name
-  environmentName: 'funcyazureresume'
+  environmentName: 'crcapp$(GUID)'
 
   # Project root folder. Point to the folder containing manage.py file.
   projectRoot: $(System.DefaultWorkingDirectory)/app_svc
@@ -89,6 +89,6 @@ stages:
           - task: AzureWebApp@1
             displayName: 'Deploy Azure Web App : funcyazureresume'
             inputs:
-              azureSubscription: $(azureServiceConnectionId)
+              azureSubscription: $(azureSubscription)
               appName: $(webAppName)
               package: $(Pipeline.Workspace)/drop/$(Build.BuildId).zip
