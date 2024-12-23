@@ -1,8 +1,8 @@
 param guidValue string
 param location string = 'centralus'
-param appName string = 'crcapp${guidValue}'
+param appName string = 'crcapp${guidValue}-2'
 param appServicePlanCapacity int = 1
-param frontDoorEndpointName string = 'afd-${guidValue}'
+param frontDoorEndpointName string = 'afd-${guidValue}-2'
 param frontDoorSkuName string = 'Standard_AzureFrontDoor'
 
 var appServicePlanName = 'appsvc${guidValue}'
