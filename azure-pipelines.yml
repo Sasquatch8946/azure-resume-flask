@@ -40,6 +40,14 @@ stages:
     pool:
       vmImage: $(vmImageName)
     steps:
+    - task: AzurePowerShell@5
+      displayName: 'Deploy app service and front door'
+      inputs: 
+         azureSubscription: 'test-iac'
+         azurePowerShellVersion: LatestVersion
+         scriptType: 'InlineScript'
+         Inline: |
+          New-AzResourceGroupDeployment -ResourceGroupName 'azureresume' -TemplateFile "$(Build.SourcesDirectory)/iac/frontend/frontdoor.bicep" -TemplateParameterObject @{"guidValue"="$(GUID)"}
     - task: UsePythonVersion@0
       inputs:
         versionSpec: '$(pythonVersion)'
