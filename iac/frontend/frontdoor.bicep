@@ -1,8 +1,8 @@
 param guidValue string
 param location string = 'centralus'
-param appName string = 'crcapp${guidValue}-2'
+param appName string = 'crcapp${guidValue}'
 param appServicePlanCapacity int = 1
-param frontDoorEndpointName string = 'afd-${guidValue}-2'
+param frontDoorEndpointName string = 'afd-${guidValue}'
 param frontDoorSkuName string = 'Standard_AzureFrontDoor'
 
 var appServicePlanName = 'appsvc${guidValue}'
@@ -97,67 +97,31 @@ resource app 'Microsoft.Web/sites@2020-06-01' = {
   }
 }
 
-resource frontDoorEndpoint 'Microsoft.Cdn/profiles/afdEndpoints@2021-06-01' = {
+resource frontDoorEndpoint 'Microsoft.Cdn/profiles/endpoints@2024-06-01-preview' = {
   name: frontDoorEndpointName
   parent: frontDoorProfile
   location: 'global'
   properties: {
     enabledState: 'Enabled'
-  }
-}
-
-resource frontDoorOriginGroup 'Microsoft.Cdn/profiles/originGroups@2021-06-01' = {
-  name: frontDoorOriginGroupName
-  parent: frontDoorProfile
-  properties: {
-    loadBalancingSettings: {
-      sampleSize: 4
-      successfulSamplesRequired: 3
-    }
-    healthProbeSettings: {
-      probePath: '/'
-      probeRequestType: 'HEAD'
-      probeProtocol: 'Http'
-      probeIntervalInSeconds: 100
-    }
-  }
-}
-
-resource frontDoorOrigin 'Microsoft.Cdn/profiles/originGroups/origins@2021-06-01' = {
-  name: frontDoorOriginName
-  parent: frontDoorOriginGroup
-  properties: {
-    hostName: app.properties.defaultHostName
-    httpPort: 80
-    httpsPort: 443
-    originHostHeader: app.properties.defaultHostName
-    priority: 1
-    weight: 1000
-  }
-}
-
-resource frontDoorRoute 'Microsoft.Cdn/profiles/afdEndpoints/routes@2021-06-01' = {
-  name: frontDoorRouteName
-  parent: frontDoorEndpoint
-  dependsOn: [
-    frontDoorOrigin // This explicit dependency is required to ensure that the origin group is not empty when the route is created.
-  ]
-  properties: {
-    originGroup: {
-      id: frontDoorOriginGroup.id
-    }
-    supportedProtocols: [
-      'Http'
-      'Https'
+    isHttpsAllowed: true
+    originGroups: []
+    originHostHeader: '${appName}.azurewebsites.net'
+    origins: [
+      {
+        name: '${frontDoorProfileName}-z13-web-core-windows-net'
+        properties: {
+          enabled: true
+          hostName: '${appName}.azurewebsites.net'
+          priority: 1
+          weight: 1000
+        }
+      }
     ]
-    patternsToMatch: [
-      '/*'
-    ]
-    forwardingProtocol: 'HttpsOnly'
-    linkToDefaultDomain: 'Enabled'
-    httpsRedirect: 'Enabled'
+    queryStringCachingBehavior: 'IgnoreQueryString'
   }
+
 }
+
 
 output appServiceHostName string = app.properties.defaultHostName
 output frontDoorEndpointHostName string = frontDoorEndpoint.properties.hostName
