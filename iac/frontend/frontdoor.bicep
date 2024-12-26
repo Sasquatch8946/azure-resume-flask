@@ -102,7 +102,6 @@ resource frontDoorEndpoint 'Microsoft.Cdn/profiles/endpoints@2024-06-01-preview'
   parent: frontDoorProfile
   location: 'global'
   properties: {
-    enabledState: 'Enabled'
     isHttpsAllowed: true
     originGroups: []
     originHostHeader: '${appName}.azurewebsites.net'
