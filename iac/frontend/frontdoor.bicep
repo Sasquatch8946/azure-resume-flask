@@ -121,6 +121,13 @@ resource frontDoorEndpoint 'Microsoft.Cdn/profiles/endpoints@2024-06-01-preview'
 
 }
 
+module accessPol '../accesspol.bicep' = { 
+  name: 'keyVaultAccessForAppSvc'
+  params: { 
+    guidValue: guidValue 
+    managedID: app.identity.principalId
+  }
+}
 
 output appServiceHostName string = app.properties.defaultHostName
 output frontDoorEndpointHostName string = frontDoorEndpoint.properties.hostName
