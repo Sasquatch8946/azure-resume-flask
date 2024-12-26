@@ -93,20 +93,6 @@ resource app 'Microsoft.Web/sites@2020-06-01' = {
           value: '3'
         }
       ]
-      ipSecurityRestrictions: [
-        {
-          tag: 'ServiceTag'
-          ipAddress: 'AzureFrontDoor.Backend'
-          action: 'Allow'
-          priority: 100
-          headers: {
-            'x-azure-fdid': [
-              frontDoorProfile.properties.frontDoorId
-            ]
-          }
-          name: 'Allow traffic from Front Door'
-        }
-      ]
     }
   }
 }
