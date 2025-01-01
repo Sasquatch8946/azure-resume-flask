@@ -35,13 +35,15 @@ $functionApp = Get-AzFunctionApp -ResourceGroupName 'azureresume'
 if (-Not($functionApp))
 {
 	Write-Host "Function app not found. Deploying..."
-	$deploy3 = New-AzResourceGroupDeployment -ResourceGroupName $rg -TemplateFile "$PSScriptRoot/azfunc.bicep" -TemplateParameterObject @{"guidValue"=$guidValue}
-	$deploy3.Outputs
 }
 else
 {
 	Write-Host "Function app already exists."
 }
+
+$deploy3 = New-AzResourceGroupDeployment -ResourceGroupName $rg -TemplateFile "$PSScriptRoot/azfunc.bicep" -TemplateParameterObject @{"guidValue"=$guidValue}
+$deploy3.Outputs
+
 
 if ($env:keyVaultManager)
 {
