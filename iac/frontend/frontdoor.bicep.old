@@ -9,6 +9,14 @@ var frontDoorProfileName = 'frontDoor${guidValue}'
 var kvName = 'kv${guidValue}'
 var secretName = 'apimSubUrl'
 
+resource frontDoorProfile 'Microsoft.Cdn/profiles@2024-09-01' = {
+  name: frontDoorProfileName
+  location: 'global'
+  sku: { 
+    name: 'Standard_Microsoft'
+  }
+}
+
 resource appServicePlan 'Microsoft.Web/serverFarms@2020-06-01' = {
   name: appServicePlanName
   location: location
@@ -85,6 +93,30 @@ resource app 'Microsoft.Web/sites@2020-06-01' = {
   }
 }
 
+resource frontDoorEndpoint 'Microsoft.Cdn/profiles/endpoints@2024-06-01-preview' = {
+  name: frontDoorEndpointName
+  parent: frontDoorProfile
+  location: 'global'
+  properties: {
+    isHttpsAllowed: true
+    originGroups: []
+    originHostHeader: '${appName}.azurewebsites.net'
+    origins: [
+      {
+        name: '${frontDoorProfileName}-z13-web-core-windows-net'
+        properties: {
+          enabled: true
+          hostName: '${appName}.azurewebsites.net'
+          priority: 1
+          weight: 1000
+        }
+      }
+    ]
+    queryStringCachingBehavior: 'IgnoreQueryString'
+  }
+
+}
+
 module accessPol '../accesspol.bicep' = { 
   name: 'keyVaultAccessForAppSvc'
   params: { 
@@ -93,16 +125,7 @@ module accessPol '../accesspol.bicep' = {
   }
 }
 
-module frontDoor './frontdoor-standard-custom-domain.bicep' = { 
-  name: 'frontDoor'
-  params: { 
-    customDomainName: 'test.seanchapman.xyz'
-    guidValue: guidValue
-    originHostName: app.properties.defaultHostName
-    endpointName: 'afd-${guidValue}'
-    skuName: 'Standard_AzureFrontDoor'
-  }
-}
 output appServiceHostName string = app.properties.defaultHostName
+output frontDoorEndpointHostName string = frontDoorEndpoint.properties.hostName
 
 

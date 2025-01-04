@@ -1,5 +1,7 @@
+param guidValue string
 @description('The name of the Front Door endpoint to create. This must be globally unique.')
-param endpointName string = 'afd-${uniqueString(resourceGroup().id)}'
+param endpointName string = 'afd-${guidValue}'
+
 
 @description('The name of the SKU to use when creating the Front Door profile.')
 @allowed([
