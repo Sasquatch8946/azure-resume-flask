@@ -2,10 +2,10 @@ param guidValue string
 param location string = 'centralus'
 param appName string = 'crcapp${guidValue}'
 param appServicePlanCapacity int = 1
-param frontDoorEndpointName string = 'afd-${guidValue}'
+param frontDoorEndpointName string = 'afd-${guidValue}-2'
+param customDomainName string = 'beta.seanchapman.xyz'
 
 var appServicePlanName = 'appsvc${guidValue}'
-var frontDoorProfileName = 'frontDoor${guidValue}'
 var kvName = 'kv${guidValue}'
 var secretName = 'apimSubUrl'
 
@@ -96,13 +96,16 @@ module accessPol '../accesspol.bicep' = {
 module frontDoor './frontdoor-standard-custom-domain.bicep' = { 
   name: 'frontDoor'
   params: { 
-    customDomainName: 'test.seanchapman.xyz'
+    customDomainName: customDomainName
     guidValue: guidValue
     originHostName: app.properties.defaultHostName
-    endpointName: 'afd-${guidValue}'
+    endpointName: frontDoorEndpointName
     skuName: 'Standard_AzureFrontDoor'
   }
 }
 output appServiceHostName string = app.properties.defaultHostName
-
+output customDomainValidationDnsTxtRecordName  string = frontDoor.outputs.customDomainValidationDnsTxtRecordName
+output customDomainValidationDnsTxtRecordValue string = frontDoor.outputs.customDomainValidationDnsTxtRecordValue
+output customDomainValidationExpiry string = frontDoor.outputs.customDomainValidationExpiry
+output frontDoorEndpointHostName string = frontDoor.outputs.frontDoorEndpointHostName
 
