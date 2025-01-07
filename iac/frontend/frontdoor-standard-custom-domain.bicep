@@ -113,6 +113,34 @@ resource route 'Microsoft.Cdn/profiles/afdEndpoints/routes@2020-09-01' = {
   }
 }
 
+// now that FD is created
+// add IP security restriction to app service so only traffic from front door is allowed
+
+resource app 'Microsoft.Web/sites@2024-04-01' existing = { 
+  name: 'crcapp${guidValue}'
+}
+
+resource siteConfig 'Microsoft.Web/sites/config@2024-04-01' = { 
+  name: 'web'
+  parent: app
+  properties: {
+    ipSecurityRestrictions: [
+      {
+        tag: 'ServiceTag'
+        ipAddress: 'AzureFrontDoor.Backend'
+        action: 'Allow'
+        priority: 100
+        headers: {
+        'x-azure-fdid': [
+            profile.properties.frontdoorId
+          ]
+        }
+        name: 'Allow traffic from Front Door'
+      }
+    ]
+  }
+}
+
 output customDomainValidationDnsTxtRecordName string = '_dnsauth.${customDomain.properties.hostName}'
 output customDomainValidationDnsTxtRecordValue string = customDomain.properties.validationProperties.validationToken
 output customDomainValidationExpiry string = customDomain.properties.validationProperties.expirationDate

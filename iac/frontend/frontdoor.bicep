@@ -101,7 +101,12 @@ module frontDoor './frontdoor-standard-custom-domain.bicep' = {
     originHostName: app.properties.defaultHostName
     endpointName: frontDoorEndpointName
     skuName: 'Standard_AzureFrontDoor'
+    profileName: 'MyFrontDoor'
   }
+
+  dependsOn: [
+    app
+  ]
 }
 output appServiceHostName string = app.properties.defaultHostName
 output customDomainValidationDnsTxtRecordName  string = frontDoor.outputs.customDomainValidationDnsTxtRecordName
