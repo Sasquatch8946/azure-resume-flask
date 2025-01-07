@@ -16,7 +16,7 @@ param originHostName string
 @description('The custom domain name to associate with your Front Door endpoint.')
 param customDomainName string
 
-var profileName = 'MyFrontDoor'
+param profileName string = 'cdnProfile${guidValue}'
 var originGroupName = 'MyOriginGroup'
 var originName = 'MyOrigin'
 var routeName = 'MyRoute'
