@@ -2,7 +2,7 @@ param guidValue string
 param location string = 'centralus'
 param appName string = 'crcapp${guidValue}'
 param appServicePlanCapacity int = 1
-param frontDoorEndpointName string = 'afd-${guidValue}-2'
+param frontDoorEndpointName string = 'afd-${guidValue}'
 param customDomainName string = 'beta.seanchapman.xyz'
 
 var appServicePlanName = 'appsvc${guidValue}'
