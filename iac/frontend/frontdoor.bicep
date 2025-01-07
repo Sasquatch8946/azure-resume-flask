@@ -4,6 +4,7 @@ param appName string = 'crcapp${guidValue}'
 param appServicePlanCapacity int = 1
 param frontDoorEndpointName string = 'afd-${guidValue}'
 param customDomainName string = 'beta.seanchapman.xyz'
+param frontDoorProfileName string = 'cdnProfile${guidValue}'
 
 var appServicePlanName = 'appsvc${guidValue}'
 var kvName = 'kv${guidValue}'
@@ -101,7 +102,7 @@ module frontDoor './frontdoor-standard-custom-domain.bicep' = {
     originHostName: app.properties.defaultHostName
     endpointName: frontDoorEndpointName
     skuName: 'Standard_AzureFrontDoor'
-    profileName: 'MyFrontDoor'
+    profileName: frontDoorProfileName
   }
 
   dependsOn: [
