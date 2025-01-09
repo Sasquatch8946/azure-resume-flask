@@ -1,4 +1,7 @@
 # Cloud Resume Challenge With a Twist - Using a Proper Backend
+
+![alt text](https://github.com/sasquatch8946/azure-resume-flask/blob/main/infra_diagram.drawio.png?raw=true)
+
 One thing that bothered me with the cloud resume challenge for the longest time was the fact that the main tutorial I used had one exposing the Azure Function API key in the frontend code.
 
 This refactor corrects that by incorporating a very simple Flask app that gets deployed to Azure App Service so it can retrieve the API URL as a secret from app settings. During local development, I load the environment variables from a .env file using the library python-dotenv.
@@ -27,4 +30,5 @@ One might be tempted to create modules and then reference everything from one ma
 
 So now, my aim is to sequentially deploy a series of templates through Azure CLI commands run in an Azure Devops pipeline.
 
-As of 11/4, I'm nearly complete with .bicep files for the backend infrastructure. I'm working on deploying my API management service with the Azure Function imported and a policy set to rate limit calls to the API. Retrieving/updating the counter in Cosmos DB from the Azure Function already works as soon as the templates are deployed. 
+As of 11/4/24, I'm nearly complete with .bicep files for the backend infrastructure. I'm working on deploying my API management service with the Azure Function imported and a policy set to rate limit calls to the API. Retrieving/updating the counter in Cosmos DB from the Azure Function already works as soon as the templates are deployed. 
+
