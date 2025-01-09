@@ -10,7 +10,7 @@ This way, I can comfortably share my code on GitHub without feeling exposed.
 
 I'm not sure why this isn't discussed widely. I've similarly found other Azure projects posted on GitHub that publish Azure Function keys.
 
-I understand that many of the people who do these projects are not developers, and many of us aren't big targets for threat actors, but still, if there was ever a vulnerability in Azure Functions, we would be leaving ourselves wide open.
+I understand that many us who do these projects are not developers, and many of us aren't big targets for threat actors, but still, if there was ever a vulnerability in Azure Functions, we would be leaving ourselves wide open.
 
 As admins, security should be a priority.
 
@@ -19,7 +19,7 @@ For historical reasons, here is [the original repo](https://github.com/Sasquatch
 # One small gotcha with Azure Front Door
 Not sure why this wasn't an issue with the Azure storage static web app, but with Flask/app service, unless you add a Cache-Control header with a value of "no-store", Front Door will cache the visitor counter. Consequently, you can refresh the page over and over again and the visitor counter will remain the same. 
 
-So, in the "view"/function that I wrote to handle coordinating the API call between the frontend JS and the Azure Function, I specified the Cache-Control header in the return statement, and that allowed the visitor counter to update as intended. 
+So, in the Flask "view"/function that I wrote to handle coordinating the API call between the frontend JS and the Azure Function, I specified the Cache-Control header in the return statement, and that allowed the visitor counter to update as intended. 
 
 # IaC
 I currently am working on creating .bicep files to automate the deployment of the entire infrastructure for this project. My most up to date work on this can be found in the "modular3" branch.
