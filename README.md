@@ -32,3 +32,4 @@ So now, my aim is to sequentially deploy a series of templates through Azure CLI
 
 As of 11/4/24, I'm nearly complete with .bicep files for the backend infrastructure. I'm working on deploying my API management service with the Azure Function imported and a policy set to rate limit calls to the API. Retrieving/updating the counter in Cosmos DB from the Azure Function already works as soon as the templates are deployed. 
 
+1/11/2025 - my IaC deployment in the modular3 branch is complete. I've successfully tested re-deploying the entire infrastructure in a separate Azure subscription to the subdomain beta.seanchapman.xyz. Next step is to redeploy the main site. Currently planning how to execute redeployment of production environment.
