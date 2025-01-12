@@ -22,8 +22,9 @@ app = func.FunctionApp()
                       partition_key="1")
 def getAndUpdateCount(req: func.HttpRequest, documents: func.DocumentList, documentsOut: func.Out[func.Document]) -> func.HttpResponse:
       if not documents:
+        logging.info("could not find documents, need to initialize docs")
         doc_dict = {'id': "1", 'count': 1}
-        documentsOut.set(doc_dict)
+        documentsOut.set(func.Document.from_dict(doc_dict))
         return func.HttpResponse(
         json.dumps(doc_dict),
         mimetype="application/json"

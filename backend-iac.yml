@@ -1,0 +1,164 @@
+# Python Function App to Linux on Azure
+# Build a Python function app and deploy it to Azure as a Linux function app.
+# Add steps that analyze code, save build artifacts, deploy, and more:
+# https://docs.microsoft.com/azure/devops/pipelines/languages/python
+
+trigger:
+  branches:
+    include:
+      - modular3
+  paths:
+    include:
+      - backend/api
+
+variables:
+  # Azure Resource Manager connection created during pipeline creation
+  azureSubscription: 'test-iac'
+
+  # Function app name
+  functionAppName: 'crcfunc$(GUID)'
+
+  # Agent VM image name
+  vmImageName: 'ubuntu-latest'
+
+  # Working Directory
+  workingDirectory: '$(System.DefaultWorkingDirectory)/backend/api'
+
+stages:
+- stage: Build
+  displayName: Build stage
+
+  jobs:
+  - job: Build
+    displayName: Build
+    pool:
+      vmImage: $(vmImageName)
+
+    steps:
+    - task: AzurePowerShell@5
+      displayName: 'Deploy Key Vault, Cosmos DB, and Function App'
+      inputs: 
+         azureSubscription: '$(azureSubscription)'
+         azurePowerShellVersion: LatestVersion
+         scriptType: 'FilePath'
+         ScriptPath: '$(Build.SourcesDirectory)/iac/deploy_stage_1.ps1'
+      env:
+        keyVaultManager: $(keyVaultManager)
+
+    - task: AzurePowerShell@5
+      displayName: 'Give Service Connection perms to key vault'
+      inputs: 
+         azureSubscription: '$(azureSubscription)'
+         azurePowerShellVersion: LatestVersion
+         scriptType: 'InlineScript'
+         Inline: |
+          New-AzResourceGroupDeployment -ResourceGroupName 'azureresume' -TemplateFile "$(Build.SourcesDirectory)/iac/accesspol.bicep" -TemplateParameterObject @{"managedID"="$env:ADOOBJECTID";"secretPerms"=@('Get', 'Set');"guidValue"="$(GUID)"}
+      env: 
+         ADOOBJECTID: $(ADOOBJECTID2)
+
+    
+    - task: CopyFiles@2
+      displayName: 'Copy powershell scripts for later use in the pipeline'
+      inputs:
+        contents: 'iac/**'
+        targetFolder: '$(Build.ArtifactStagingDirectory)'
+    - publish: '$(Build.ArtifactStagingDirectory)/iac'
+      displayName: 'Publish powershell and bicep scripts for later use'
+      artifact: dropScripts
+
+    - bash: |
+        if [ -f extensions.csproj ]
+        then
+            dotnet build extensions.csproj --runtime ubuntu.16.04-x64 --output ./bin
+        fi
+      workingDirectory: $(workingDirectory)
+      displayName: 'Build extensions'
+
+    - task: UsePythonVersion@0
+      displayName: 'Use Python 3.10'
+      inputs:
+        versionSpec: 3.10 # Functions V2 supports Python 3.6 as of today
+
+    - bash: |
+        pip install --target="./.python_packages/lib/site-packages" -r ./requirements.txt
+      workingDirectory: $(workingDirectory)
+      displayName: 'Install application dependencies'
+
+    - task: ArchiveFiles@2
+      displayName: 'Archive files'
+      inputs:
+        rootFolderOrFile: '$(workingDirectory)'
+        includeRootFolder: false
+        archiveType: zip
+        archiveFile: $(Build.ArtifactStagingDirectory)/$(Build.BuildId).zip
+        replaceExistingArchive: true
+
+    - publish: $(Build.ArtifactStagingDirectory)/$(Build.BuildId).zip
+      artifact: drop
+
+    - bash: |
+        pwd
+        pip install pytest pytest-azurepipelines azure-functions
+        python -m pytest tests
+      workingDirectory: $(workingDirectory)
+
+      
+- stage: Deploy
+  displayName: Deploy stage
+  dependsOn: Build
+  condition: succeeded()
+
+  jobs:
+  - deployment: Deploy
+    displayName: Deploy
+    environment: 'development'
+    pool:
+      vmImage: $(vmImageName)
+
+    strategy:
+      runOnce:
+        deploy:
+
+          steps:
+          - task: AzureFunctionApp@1
+            displayName: 'Azure functions app deploy'
+            inputs:
+              azureSubscription: '$(azureSubscription)'
+              appType: functionAppLinux
+              appName: $(functionAppName)
+              package: '$(Pipeline.Workspace)/drop/$(Build.BuildId).zip'
+
+- stage: Post_Deployment
+  displayName: Post_Deployment Stage
+  dependsOn: Deploy
+  condition: succeeded()
+
+  jobs:
+  - deployment: Post_Deployment
+    displayName: Post_Deployment Resource Creation
+    environment: 'development'
+    pool:
+      vmImage: $(vmImageName)
+
+    strategy:
+      runOnce:
+        deploy:
+
+          steps:
+          - download: current
+            artifact: dropScripts
+
+          - task: AzureCLI@2
+            displayName: "Store function app keys in key vault"
+            inputs:
+              azureSubscription: '$(azureSubscription)'
+              scriptType: pscore
+              scriptPath: '$(Pipeline.Workspace)/dropScripts/Get-FunctionAppKeys.ps1'
+    
+          - task: AzurePowerShell@5
+            displayName: 'Deploy APIM'
+            inputs: 
+              azureSubscription: '$(azureSubscription)'
+              azurePowerShellVersion: LatestVersion
+              scriptType: 'FilePath'
+              ScriptPath: '$(Pipeline.Workspace)/dropScripts/deploy_stage_2.ps1'

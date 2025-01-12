@@ -18,13 +18,13 @@ variables:
   azureServiceConnectionId: ${{ variables.serviceConnect }}
 
   # Web app name
-  webAppName: 'funcyazureresume'
+  webAppName: 'crcapp$(GUID)'
 
   # Agent VM image name
   vmImageName: 'ubuntu-latest'
 
   # Environment name
-  environmentName: 'funcyazureresume'
+  environmentName: 'crcapp$(GUID)'
 
   # Project root folder. Point to the folder containing manage.py file.
   projectRoot: $(System.DefaultWorkingDirectory)/app_svc
@@ -40,6 +40,14 @@ stages:
     pool:
       vmImage: $(vmImageName)
     steps:
+    - task: AzurePowerShell@5
+      displayName: 'Deploy app service and front door'
+      inputs: 
+         azureSubscription: 'test-iac'
+         azurePowerShellVersion: LatestVersion
+         scriptType: 'InlineScript'
+         Inline: |
+          New-AzResourceGroupDeployment -ResourceGroupName 'azureresume' -TemplateFile "$(Build.SourcesDirectory)/iac/frontend/frontdoor.bicep" -TemplateParameterObject @{"guidValue"="$(GUID)"}
     - task: UsePythonVersion@0
       inputs:
         versionSpec: '$(pythonVersion)'
