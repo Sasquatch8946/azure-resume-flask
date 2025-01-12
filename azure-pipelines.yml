@@ -15,7 +15,7 @@ trigger:
 
 variables:
   # Azure Resource Manager connection created during pipeline creation
-  azureServiceConnectionId: '${{ variables.serviceConnect }}'
+  azureServiceConnectionId: '6814a012-7b53-4519-9c8e-2c7cba29f4d4'
 
   # Web app name
   webAppName: 'crcapp$(GUID)'
