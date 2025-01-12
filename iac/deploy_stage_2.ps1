@@ -2,10 +2,7 @@ Param
 (
     [string]$guidValue=${env:GUID}
 )
-# TODO: need if statements for the named value and probably the policy, too 
-# named value doesn't deploy if key vault secret isn't created
-# Get-AzApiManagementNamedValue
-Write-Host "GUIDVALUE: $guidValue"
+
 $kvName = 'kv' + $guidValue
 $rg = 'azureresume'
 
