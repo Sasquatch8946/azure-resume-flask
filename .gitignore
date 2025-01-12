@@ -6,3 +6,5 @@ app_svc/.env
 *.zip
 /iac/*.txt
 /backend/api/local.settings.json
+/iac/*.txt
+/iac/*.old

@@ -75,6 +75,15 @@ stages:
       displayName: 'Upload package'
       artifact: drop
 
+    - task: AzurePowerShell@5
+      displayName: 'Deploy App Service and Front Door'
+      inputs: 
+         azureSubscription: 'test-iac'
+         azurePowerShellVersion: LatestVersion
+         scriptType: 'InlineScript'
+         Inline: |
+          New-AzResourceGroupDeployment -ResourceGroupName 'azureresume' -TemplateFile "$(Build.SourcesDirectory)/iac/frontend/frontdoor.bicep" -TemplateParameterObject @{"guidValue"="$(GUID)"}
+
 - stage: Deploy
   displayName: 'Deploy Web App'
   dependsOn: Build
