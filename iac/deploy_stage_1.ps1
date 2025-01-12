@@ -13,7 +13,7 @@ if (-Not($kv))
 {
     Write-Host "Key vault not found. Deploying..."
     $deploy = New-AzResourceGroupDeployment -ResourceGroupName $rg -TemplateFile "$PSScriptRoot/keyvault.bicep" -TemplateParameterObject @{"guidValue"=$guidValue}
-    $deployOutputs
+    $deploy.Outputs
 }
 else  
 {
