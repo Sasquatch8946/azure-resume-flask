@@ -34,13 +34,15 @@ else
 $functionApp = Get-AzFunctionApp -ResourceGroupName 'azureresume'
 if (-Not($functionApp))
 {
-	Write-Host "Function app not found. Deploying..."
+	Write-Host "Function app not found."
 }
 else
 {
 	Write-Host "Function app already exists."
 }
 
+# deploying function app every time in order to update settings as needed
+# able to re-deploy this resource over and over again without issue
 $deploy3 = New-AzResourceGroupDeployment -ResourceGroupName $rg -TemplateFile "$PSScriptRoot/azfunc.bicep" -TemplateParameterObject @{"guidValue"=$guidValue}
 $deploy3.Outputs
 
