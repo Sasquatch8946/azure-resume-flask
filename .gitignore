@@ -8,3 +8,4 @@ app_svc/.env
 /backend/api/local.settings.json
 /iac/*.txt
 /iac/*.old
+.vscode
