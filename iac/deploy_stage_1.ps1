@@ -11,7 +11,7 @@ $rg = 'azureresume'
 $kv = Get-AzKeyVault -ResourceGroupName $rg -VaultName $kvName
 if (-Not($kv))
 {
-    Write-Host "Key vault not found. Deploying..."
+    Write-Host "Key vault not found. Deploying for the first time."
 }
 else  
 {
@@ -24,7 +24,7 @@ $deploy.Outputs
 $cosmos = Get-AzCosmosDBAccount -ResourceGroupName 'azureresume'
 if (-Not($cosmos))
 {
-	Write-Host "Cosmos DB not found. Deploying..."
+	Write-Host "Cosmos DB not found. Deploying for the first time."
 }
 else
 {
@@ -37,7 +37,7 @@ $deploy2.Outputs
 $functionApp = Get-AzFunctionApp -ResourceGroupName 'azureresume'
 if (-Not($functionApp))
 {
-	Write-Host "Function app not found."
+	Write-Host "Function app not found. Deploying for the first time."
 }
 else
 {
