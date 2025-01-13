@@ -3,7 +3,7 @@ param location string = 'centralus'
 param appName string = 'crcapp${guidValue}'
 param appServicePlanCapacity int = 1
 param frontDoorEndpointName string = 'afd-${guidValue}'
-param customDomainName string = subscription().displayName == 'Azure subscription 1' ? 'seanchapman.xyz' : 'beta.seanchapman.xyz'
+param customDomainName string = subscription().displayName == 'Azure subscription 1' ? 'www.seanchapman.xyz' : 'beta.seanchapman.xyz'
 param frontDoorProfileName string = 'cdnProfile${guidValue}'
 
 var appServicePlanName = 'appsvc${guidValue}'
