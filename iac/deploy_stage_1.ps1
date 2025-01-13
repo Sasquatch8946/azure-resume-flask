@@ -52,7 +52,7 @@ $deploy3.Outputs
 if ($env:keyVaultManager)
 {
 	Write-Host "Detected keyVaultManager, going to configure key vault access."
-	$deploy4 = New-AzResourceGroupDeployment -ResourceGroupName $rg -TemplateFile "$PSScriptRoot/accesspol.bicep" -TemplateParameterObject @{"guidValue"=$guidValue; managedID="$($env:keyVaultManager)"}
+	$deploy4 = New-AzResourceGroupDeployment -ResourceGroupName $rg -TemplateFile "$PSScriptRoot/accesspol.bicep" -TemplateParameterObject @{"guidValue"=$guidValue; managedID="$($env:keyVaultManager)"; secretPerms=@('Get', 'List')}
 	$deploy4.Outputs
 }
 else 
