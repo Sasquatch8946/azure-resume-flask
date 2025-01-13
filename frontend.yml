@@ -15,9 +15,9 @@ trigger:
 
 variables:
   # Azure Resource Manager connection created during pipeline creation
-  azureServiceConnectionId: 'bc999236-19c1-44b0-83a4-8430bf78ce20'
+  azureServiceConnectionId: '87e49c6c-2afb-446c-91bd-6b86b2a362a4'
 
-  azureSubscription: 'crc-ado-pipelines'
+  azureSubscription: 'crc-ado-pipelines2'
 
   # Web app name
   webAppName: 'crcapp$(GUID)'
