@@ -17,6 +17,8 @@ variables:
   # Azure Resource Manager connection created during pipeline creation
   azureServiceConnectionId: 'bc999236-19c1-44b0-83a4-8430bf78ce20'
 
+  azureSubscription: 'crc-ado-pipelines'
+
   # Web app name
   webAppName: 'crcapp$(GUID)'
 
@@ -43,7 +45,7 @@ stages:
     - task: AzurePowerShell@5
       displayName: 'Deploy app service and front door'
       inputs: 
-         azureSubscription: 'test-iac'
+         azureSubscription: $(azureSubscription)
          azurePowerShellVersion: LatestVersion
          scriptType: 'InlineScript'
          Inline: |
@@ -78,7 +80,7 @@ stages:
     - task: AzurePowerShell@5
       displayName: 'Deploy App Service and Front Door'
       inputs: 
-         azureSubscription: 'test-iac'
+         azureSubscription: $(azureSubscription)
          azurePowerShellVersion: LatestVersion
          scriptType: 'InlineScript'
          Inline: |
