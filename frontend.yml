@@ -52,7 +52,7 @@ stages:
          azurePowerShellVersion: LatestVersion
          scriptType: 'InlineScript'
          Inline: |
-          New-AzResourceGroupDeployment -ResourceGroupName '$(resourceGroup)' -TemplateFile "$(Build.SourcesDirectory)/iac/frontend/frontdoor.bicep" -TemplateParameterObject @{"guidValue"="$(GUID)"}
+          New-AzResourceGroupDeployment -ResourceGroupName "$(resourceGroup)" -TemplateFile "$(Build.SourcesDirectory)/iac/frontend/frontdoor.bicep" -TemplateParameterObject @{"guidValue"="$(GUID)"}
     - task: UsePythonVersion@0
       inputs:
         versionSpec: '$(pythonVersion)'
@@ -87,7 +87,7 @@ stages:
          azurePowerShellVersion: LatestVersion
          scriptType: 'InlineScript'
          Inline: |
-          New-AzResourceGroupDeployment -ResourceGroupName '$(resourceGroup)' -TemplateFile "$(Build.SourcesDirectory)/iac/frontend/frontdoor.bicep" -TemplateParameterObject @{"guidValue"="$(GUID)"}
+          New-AzResourceGroupDeployment -ResourceGroupName "$(resourceGroup)" -TemplateFile "$(Build.SourcesDirectory)/iac/frontend/frontdoor.bicep" -TemplateParameterObject @{"guidValue"="$(GUID)"}
 
 - stage: Deploy
   displayName: 'Deploy Web App'
