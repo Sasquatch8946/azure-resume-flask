@@ -1,12 +1,11 @@
 Param
 (
-    [string]$guidValue=${env:GUID}
+    [string]$guidValue=${env:GUID},
+    [string]$rg=${resourceGroup}
 )
-Write-Host "GUIDVALUE: $guidValue"
 $kvName = 'kv' + $guidValue
 # if key vault not exist, create
 # else get existing key vault for use in bicep deployment
-$rg = 'azureresume'
 
 $kv = Get-AzKeyVault -ResourceGroupName $rg -VaultName $kvName
 if (-Not($kv))
