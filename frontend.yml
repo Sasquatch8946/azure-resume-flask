@@ -15,9 +15,9 @@ trigger:
 
 variables:
   # Azure Resource Manager connection created during pipeline creation
-  azureServiceConnectionId: 'bc999236-19c1-44b0-83a4-8430bf78ce20'
+  azureServiceConnectionId: '87e49c6c-2afb-446c-91bd-6b86b2a362a4'
 
-  azureSubscription: 'crc-ado-pipelines'
+  azureSubscription: 'crc-ado-pipelines2'
 
   # Web app name
   webAppName: 'crcapp$(GUID)'
@@ -34,9 +34,6 @@ variables:
   # Python version: 3.10
   pythonVersion: '3.10'
 
-  # resource group
-  resourceGroup: $(resourceGroup)
-
 stages:
 - stage: Build
   displayName: Build stage
@@ -52,7 +49,7 @@ stages:
          azurePowerShellVersion: LatestVersion
          scriptType: 'InlineScript'
          Inline: |
-          New-AzResourceGroupDeployment -ResourceGroupName '$(resourceGroup)' -TemplateFile "$(Build.SourcesDirectory)/iac/frontend/frontdoor.bicep" -TemplateParameterObject @{"guidValue"="$(GUID)"}
+          New-AzResourceGroupDeployment -ResourceGroupName "$(resourceGroup)" -TemplateFile "$(Build.SourcesDirectory)/iac/frontend/frontdoor.bicep" -TemplateParameterObject @{"guidValue"="$(GUID)"}
     - task: UsePythonVersion@0
       inputs:
         versionSpec: '$(pythonVersion)'
@@ -87,7 +84,7 @@ stages:
          azurePowerShellVersion: LatestVersion
          scriptType: 'InlineScript'
          Inline: |
-          New-AzResourceGroupDeployment -ResourceGroupName '$(resourceGroup)' -TemplateFile "$(Build.SourcesDirectory)/iac/frontend/frontdoor.bicep" -TemplateParameterObject @{"guidValue"="$(GUID)"}
+          New-AzResourceGroupDeployment -ResourceGroupName "$(resourceGroup)" -TemplateFile "$(Build.SourcesDirectory)/iac/frontend/frontdoor.bicep" -TemplateParameterObject @{"guidValue"="$(GUID)"}
 
 - stage: Deploy
   displayName: 'Deploy Web App'
