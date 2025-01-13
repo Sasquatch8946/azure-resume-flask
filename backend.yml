@@ -38,7 +38,7 @@ stages:
     - task: AzurePowerShell@5
       displayName: 'Deploy Key Vault, Cosmos DB, and Function App'
       inputs: 
-         azureSubscription: $(azureSubscription)
+         azureSubscription: 'crc-ado-pipelines'
          azurePowerShellVersion: LatestVersion
          scriptType: 'FilePath'
          ScriptPath: '$(Build.SourcesDirectory)/iac/deploy_stage_1.ps1'
