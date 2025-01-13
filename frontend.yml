@@ -94,7 +94,7 @@ stages:
        script: |
          pwd 
          pip install -r requirements.txt
-         pytest
+         python -m pytest tests
        workingDirectory: $(projectRoot)
       env: 
         ENVIRONMENT: $(ENVIRONMENT)
