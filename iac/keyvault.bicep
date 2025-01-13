@@ -8,6 +8,7 @@ resource keyVault 'Microsoft.KeyVault/vaults@2023-07-01' = {
     enabledForTemplateDeployment: true
     enablePurgeProtection: true 
     enableSoftDelete: true
+    accessPolicies: []
     createMode: 'default'
     sku: {
       family: 'A'
