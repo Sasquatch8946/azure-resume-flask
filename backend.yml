@@ -24,6 +24,9 @@ variables:
   # Working Directory
   workingDirectory: '$(System.DefaultWorkingDirectory)/backend/api'
 
+  # Resource Group
+  resourceGroup: $(resourceGroup)
+
 stages:
 - stage: Build
   displayName: Build stage
@@ -52,7 +55,7 @@ stages:
          azurePowerShellVersion: LatestVersion
          scriptType: 'InlineScript'
          Inline: |
-          New-AzResourceGroupDeployment -ResourceGroupName 'azureresume' -TemplateFile "$(Build.SourcesDirectory)/iac/accesspol.bicep" -TemplateParameterObject @{"managedID"="$env:ADOOBJECTID";"secretPerms"=@('Get', 'Set');"guidValue"="$(GUID)"}
+          New-AzResourceGroupDeployment -ResourceGroupName '$(resourceGroup)' -TemplateFile "$(Build.SourcesDirectory)/iac/accesspol.bicep" -TemplateParameterObject @{"managedID"="$env:ADOOBJECTID";"secretPerms"=@('Get', 'Set');"guidValue"="$(GUID)"}
       env: 
          ADOOBJECTID: $(ADOOBJECTID2)
 

@@ -15,7 +15,9 @@ trigger:
 
 variables:
   # Azure Resource Manager connection created during pipeline creation
-  azureServiceConnectionId: ${{ variables.serviceConnect }}
+  azureServiceConnectionId: 'bc999236-19c1-44b0-83a4-8430bf78ce20'
+
+  azureSubscription: 'crc-ado-pipelines'
 
   # Web app name
   webAppName: 'crcapp$(GUID)'
@@ -32,6 +34,9 @@ variables:
   # Python version: 3.10
   pythonVersion: '3.10'
 
+  # resource group
+  resourceGroup: $(resourceGroup)
+
 stages:
 - stage: Build
   displayName: Build stage
@@ -43,11 +48,11 @@ stages:
     - task: AzurePowerShell@5
       displayName: 'Deploy app service and front door'
       inputs: 
-         azureSubscription: 'test-iac'
+         azureSubscription: $(azureSubscription)
          azurePowerShellVersion: LatestVersion
          scriptType: 'InlineScript'
          Inline: |
-          New-AzResourceGroupDeployment -ResourceGroupName 'azureresume' -TemplateFile "$(Build.SourcesDirectory)/iac/frontend/frontdoor.bicep" -TemplateParameterObject @{"guidValue"="$(GUID)"}
+          New-AzResourceGroupDeployment -ResourceGroupName '$(resourceGroup)' -TemplateFile "$(Build.SourcesDirectory)/iac/frontend/frontdoor.bicep" -TemplateParameterObject @{"guidValue"="$(GUID)"}
     - task: UsePythonVersion@0
       inputs:
         versionSpec: '$(pythonVersion)'
@@ -78,11 +83,11 @@ stages:
     - task: AzurePowerShell@5
       displayName: 'Deploy App Service and Front Door'
       inputs: 
-         azureSubscription: 'test-iac'
+         azureSubscription: $(azureSubscription)
          azurePowerShellVersion: LatestVersion
          scriptType: 'InlineScript'
          Inline: |
-          New-AzResourceGroupDeployment -ResourceGroupName 'azureresume' -TemplateFile "$(Build.SourcesDirectory)/iac/frontend/frontdoor.bicep" -TemplateParameterObject @{"guidValue"="$(GUID)"}
+          New-AzResourceGroupDeployment -ResourceGroupName '$(resourceGroup)' -TemplateFile "$(Build.SourcesDirectory)/iac/frontend/frontdoor.bicep" -TemplateParameterObject @{"guidValue"="$(GUID)"}
 
 - stage: Deploy
   displayName: 'Deploy Web App'
@@ -104,7 +109,7 @@ stages:
             displayName: 'Use Python version'
 
           - task: AzureWebApp@1
-            displayName: 'Deploy Azure Web App : funcyazureresume'
+            displayName: 'Deploy Azure Web App : $(webAppName)'
             inputs:
               azureSubscription: $(azureServiceConnectionId)
               appName: $(webAppName)
