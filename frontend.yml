@@ -96,6 +96,9 @@ stages:
          pip install -r requirements.txt
          pytest
        workingDirectory: $(projectRoot)
+      env: 
+        ENVIRONMENT: $(ENVIRONMENT)
+        FUNCTION_URL: $(FUNCTION_URL)
 
 - stage: Deploy
   displayName: 'Deploy Web App'
