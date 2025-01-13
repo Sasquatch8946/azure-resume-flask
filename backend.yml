@@ -24,9 +24,6 @@ variables:
   # Working Directory
   workingDirectory: '$(System.DefaultWorkingDirectory)/backend/api'
 
-  # Resource Group
-  resourceGroup: $(resourceGroup)
-
 stages:
 - stage: Build
   displayName: Build stage
