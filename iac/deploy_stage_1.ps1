@@ -1,7 +1,7 @@
 Param
 (
     [string]$guidValue=${env:GUID},
-    [string]$rg=${resourceGroup}
+    [string]$rg=${env:resourceGroup}
 )
 $kvName = 'kv' + $guidValue
 # if key vault not exist, create
