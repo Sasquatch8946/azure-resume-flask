@@ -24,9 +24,6 @@ variables:
   # Working Directory
   workingDirectory: '$(System.DefaultWorkingDirectory)/backend/api'
 
-  # Resource Group
-  resourceGroup: $(resourceGroup)
-
 stages:
 - stage: Build
   displayName: Build stage
@@ -47,6 +44,7 @@ stages:
          ScriptPath: '$(Build.SourcesDirectory)/iac/deploy_stage_1.ps1'
       env:
         keyVaultManager: $(keyVaultManager)
+        resourceGroup: $(resourceGroup)
 
     - task: AzurePowerShell@5
       displayName: 'Give Service Connection perms to key vault'
@@ -165,3 +163,5 @@ stages:
               azurePowerShellVersion: LatestVersion
               scriptType: 'FilePath'
               ScriptPath: '$(Pipeline.Workspace)/dropScripts/deploy_stage_2.ps1'
+            env:
+              resourceGroup: $(resourceGroup)
