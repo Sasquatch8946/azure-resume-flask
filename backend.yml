@@ -157,8 +157,8 @@ stages:
               scriptPath: '$(Pipeline.Workspace)/dropScripts/Get-FunctionAppKeys.ps1'
             env:
               guidValue: $(GUID)
-              rg: $(resourceGroup)
-              
+              resourceGroup: $(resourceGroup)
+
           - task: AzurePowerShell@5
             displayName: 'Deploy APIM'
             inputs: 
