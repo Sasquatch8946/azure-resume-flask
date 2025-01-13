@@ -24,12 +24,12 @@ def test_home(client):
     assert response.status_code == 200
     assert b"Hi, I'm Sean Chapman" in response.data
 
-def test_about(client, mock_api):
+def test_about(client):
     """Test the about route."""
-    response = mock_api.get('/read_db', json={"id": "1", "count": 2})
-    print(response)
-    # assert response.status_code == 200
-    assert response["count"] == 2
+    response = client.get('/read_db')
+    # print(response)
+    assert response.status_code == 200
+
 
 
 def test_non_existent_route(client):
