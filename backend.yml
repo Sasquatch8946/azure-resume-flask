@@ -13,7 +13,7 @@ trigger:
 
 variables:
   # Azure Resource Manager connection created during pipeline creation
-  azureSubscription: 'crc-ado-pipelines'
+  azureSubscription: 'crc-ado-pipelines2'
 
   # Function app name
   functionAppName: 'crcfunc$(GUID)'
@@ -38,7 +38,7 @@ stages:
     - task: AzurePowerShell@5
       displayName: 'Deploy Key Vault, Cosmos DB, and Function App'
       inputs: 
-         azureSubscription: '$(azureSubscription)'
+         azureSubscription: $(azureSubscription)
          azurePowerShellVersion: LatestVersion
          scriptType: 'FilePath'
          ScriptPath: '$(Build.SourcesDirectory)/iac/deploy_stage_1.ps1'
@@ -49,7 +49,7 @@ stages:
     - task: AzurePowerShell@5
       displayName: 'Give Service Connection perms to key vault'
       inputs: 
-         azureSubscription: '$(azureSubscription)'
+         azureSubscription: $(azureSubscription)
          azurePowerShellVersion: LatestVersion
          scriptType: 'InlineScript'
          Inline: |
@@ -152,14 +152,14 @@ stages:
           - task: AzureCLI@2
             displayName: "Store function app keys in key vault"
             inputs:
-              azureSubscription: '$(azureSubscription)'
+              azureSubscription: $(azureSubscription)
               scriptType: pscore
               scriptPath: '$(Pipeline.Workspace)/dropScripts/Get-FunctionAppKeys.ps1'
     
           - task: AzurePowerShell@5
             displayName: 'Deploy APIM'
             inputs: 
-              azureSubscription: '$(azureSubscription)'
+              azureSubscription: $(azureSubscription)
               azurePowerShellVersion: LatestVersion
               scriptType: 'FilePath'
               ScriptPath: '$(Pipeline.Workspace)/dropScripts/deploy_stage_2.ps1'
