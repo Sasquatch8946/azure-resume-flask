@@ -3,14 +3,11 @@ import os
 
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-from app import app 
+from app import app
 import pytest
-import requests_mock
-
-@pytest.fixture
-def mock_api():
-    with requests_mock.Mocker() as m:
-        yield m
+import json
+import responses
+import os
 
 @pytest.fixture
 def client():
@@ -24,11 +21,23 @@ def test_home(client):
     assert response.status_code == 200
     assert b"Hi, I'm Sean Chapman" in response.data
 
-def test_about(client):
-    """Test the about route."""
+@responses.activate
+def test_read_db(client):
+    """Test the read_db route."""
+    FUNCTION_URL = os.getenv("FUNCTION_URL")
+    mocked_response = {"id": "1", "count": 2}
+    responses.add( 
+        method=responses.GET,
+        url=FUNCTION_URL, 
+        json=mocked_response,
+        status=200
+    )
+
     response = client.get('/read_db')
-    # print(response)
     assert response.status_code == 200
+    assert json.loads(response.get_data(as_text=True)) == mocked_response
+    assert response.headers['Cache-Control'] == 'no-store'
+
 
 
 
