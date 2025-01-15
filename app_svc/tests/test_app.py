@@ -38,6 +38,23 @@ def test_read_db(client):
     assert json.loads(response.get_data(as_text=True)) == mocked_response
     assert response.headers['Cache-Control'] == 'no-store'
 
+@responses.activate
+def test_read_db_too_many_requests(client):
+    """Test the read_db route."""
+    FUNCTION_URL = os.getenv("FUNCTION_URL")
+    mocked_response = {"id": "1", "count": 2}
+    responses.add( 
+        method=responses.GET,
+        url=FUNCTION_URL, 
+        json=mocked_response,
+        status=429
+    )
+
+    response = client.get('/read_db')
+    assert response.status_code == 429
+    assert json.loads(response.get_data(as_text=True)) == mocked_response
+    assert response.headers['Cache-Control'] == 'no-store'
+
 
 
 
