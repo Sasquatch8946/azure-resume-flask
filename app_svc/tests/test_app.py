@@ -40,9 +40,9 @@ def test_read_db(client):
 
 @responses.activate
 def test_read_db_too_many_requests(client):
-    """Test the read_db route."""
+    """Test the read_db route when the external API gets called to many times"""
     FUNCTION_URL = os.getenv("FUNCTION_URL")
-    mocked_response = {"id": "1", "count": 2}
+    mocked_response = {"statusCode": 429, "message": "Rate limit is exceeded."}
     responses.add( 
         method=responses.GET,
         url=FUNCTION_URL, 
