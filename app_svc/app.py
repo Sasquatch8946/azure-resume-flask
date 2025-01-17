@@ -10,10 +10,7 @@ app = Flask(__name__)
 def getCounter():
     FUNCTION_URL = os.getenv("FUNCTION_URL")
     res = requests.get(url=FUNCTION_URL)
-    # app.logger.info("reading database")
-    # res.raise_for_status()
     resJSON = res.json()
-    print(resJSON, file=sys.stderr)
     return resJSON, res.status_code, {'Cache-Control': 'no-store'}
 
 @app.route("/")
