@@ -1,10 +1,10 @@
 Param
 (
-    [string]$guidValue=${env:GUID}
+    [string]$guidValue=${env:GUID},
+    [string]$rg=${env:resourceGroup}
 )
 
 $kvName = 'kv' + $guidValue
-$rg = 'azureresume'
 
 $apim = Get-AzApiManagement -ResourceGroupName $rg
 if (-Not($apim))

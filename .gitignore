@@ -3,6 +3,11 @@
 __pycache__
 .azure
 app_svc/.env
+*.venv
+*venv
 *.zip
 /iac/*.txt
 /backend/api/local.settings.json
+/iac/*.txt
+/iac/*.old
+.vscode

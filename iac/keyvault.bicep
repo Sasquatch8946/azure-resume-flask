@@ -6,18 +6,21 @@ resource keyVault 'Microsoft.KeyVault/vaults@2023-07-01' = {
   location: location
   properties: {
     enabledForTemplateDeployment: true
+    enablePurgeProtection: true 
+    enableSoftDelete: true
+    accessPolicies: []
     createMode: 'default'
     sku: {
       family: 'A'
       name: 'standard'
     }
-    accessPolicies: []
     networkAcls: {
       defaultAction: 'Allow'
       bypass: 'AzureServices'
     }
     tenantId: subscription().tenantId
   }
+
 
 
 

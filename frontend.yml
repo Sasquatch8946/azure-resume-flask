@@ -15,7 +15,10 @@ trigger:
 
 variables:
   # Azure Resource Manager connection created during pipeline creation
-  azureServiceConnectionId: '6814a012-7b53-4519-9c8e-2c7cba29f4d4'
+
+  azureServiceConnectionId: '87e49c6c-2afb-446c-91bd-6b86b2a362a4'
+
+  azureSubscription: 'crc-ado-pipelines2'
 
   # Web app name
   webAppName: 'crcapp$(GUID)'
@@ -32,6 +35,7 @@ variables:
   # Python version: 3.10
   pythonVersion: '3.10'
 
+
 stages:
 - stage: Build
   displayName: Build stage
@@ -43,11 +47,11 @@ stages:
     - task: AzurePowerShell@5
       displayName: 'Deploy app service and front door'
       inputs: 
-         azureSubscription: 'test-iac'
+         azureSubscription: $(azureSubscription)
          azurePowerShellVersion: LatestVersion
          scriptType: 'InlineScript'
          Inline: |
-          New-AzResourceGroupDeployment -ResourceGroupName 'azureresume' -TemplateFile "$(Build.SourcesDirectory)/iac/frontend/frontdoor.bicep" -TemplateParameterObject @{"guidValue"="$(GUID)"}
+          New-AzResourceGroupDeployment -ResourceGroupName "$(resourceGroup)" -TemplateFile "$(Build.SourcesDirectory)/iac/frontend/frontdoor.bicep" -TemplateParameterObject @{"guidValue"="$(GUID)"}
     - task: UsePythonVersion@0
       inputs:
         versionSpec: '$(pythonVersion)'
@@ -75,6 +79,28 @@ stages:
       displayName: 'Upload package'
       artifact: drop
 
+    - task: AzurePowerShell@5
+      displayName: 'Deploy App Service and Front Door'
+      inputs: 
+         azureSubscription: $(azureSubscription)
+         azurePowerShellVersion: LatestVersion
+         scriptType: 'InlineScript'
+         Inline: |
+          New-AzResourceGroupDeployment -ResourceGroupName "$(resourceGroup)" -TemplateFile "$(Build.SourcesDirectory)/iac/frontend/frontdoor.bicep" -TemplateParameterObject @{"guidValue"="$(GUID)"}
+    
+    - task: Bash@3
+      displayName: 'run pytest tests'
+      inputs: 
+       targetType: inline
+       script: |
+         pwd 
+         pip install -r requirements.txt
+         python -m pytest tests
+       workingDirectory: $(projectRoot)
+      env: 
+        ENVIRONMENT: $(ENVIRONMENT)
+        FUNCTION_URL: $(FUNCTION_URL)
+
 - stage: Deploy
   displayName: 'Deploy Web App'
   dependsOn: Build
@@ -95,7 +121,7 @@ stages:
             displayName: 'Use Python version'
 
           - task: AzureWebApp@1
-            displayName: 'Deploy Azure Web App : funcyazureresume'
+            displayName: 'Deploy Azure Web App : $(webAppName)'
             inputs:
               azureSubscription: $(azureServiceConnectionId)
               appName: $(webAppName)
