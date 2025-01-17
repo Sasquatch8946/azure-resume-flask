@@ -1,6 +1,8 @@
 from flask import Flask, render_template
 import requests
 import os
+import logging
+import sys
 
 app = Flask(__name__)
 
@@ -8,9 +10,11 @@ app = Flask(__name__)
 def getCounter():
     FUNCTION_URL = os.getenv("FUNCTION_URL")
     res = requests.get(url=FUNCTION_URL)
-    res.raise_for_status()
+    # app.logger.info("reading database")
+    # res.raise_for_status()
     resJSON = res.json()
-    return resJSON, 200, {'Cache-Control': 'no-store'}
+    print(resJSON, file=sys.stderr)
+    return resJSON, res.status_code, {'Cache-Control': 'no-store'}
 
 @app.route("/")
 def index():
